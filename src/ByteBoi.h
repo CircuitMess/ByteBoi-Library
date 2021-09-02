@@ -10,7 +10,7 @@
 #include <Input/InputI2C.h>
 #include <Audio/Piezo.h>
 
-class NibbleImpl {
+class ByteBoiImpl {
 public:
 
 	/**
@@ -29,6 +29,6 @@ private:
 
 };
 
-extern NibbleImpl Nibble;
+extern ByteBoiImpl ByteBoi;
 
 #endif //NIBBLE_NIBBLE_H

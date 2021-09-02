@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Nibble)
+project(ByteBoi)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -16,5 +16,5 @@ add_definitions(-DCIRCUITOS_LITTLEFS)
 add_definitions(-DCIRCUITOS_TONE)
 add_definitions(-DCIRCUITOS_LOWRAM)
 
-SET_SOURCE_FILES_PROPERTIES(Nibble.ino PROPERTIES LANGUAGE CXX)
-add_executable(Nibble ${SOURCES} Nibble.ino)
+SET_SOURCE_FILES_PROPERTIES(ByteBoi.ino PROPERTIES LANGUAGE CXX)
+add_executable(Nibble ${SOURCES} ByteBoi.ino)

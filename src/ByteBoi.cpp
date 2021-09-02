@@ -1,8 +1,8 @@
-#include "Nibble.h"
+#include "ByteBoi.h"
 
-NibbleImpl Nibble;
+ByteBoiImpl ByteBoi;
 
-void NibbleImpl::begin(){
+void ByteBoiImpl::begin(){
 	display = new Display(128, 128, -1, 0);
 	expander = new I2cExpander();
 
@@ -20,14 +20,14 @@ void NibbleImpl::begin(){
 	Piezo.begin(BUZZ_PIN);
 }
 
-Display* NibbleImpl::getDisplay(){
+Display* ByteBoiImpl::getDisplay(){
 	return display;
 }
 
-I2cExpander* NibbleImpl::getExpander(){
+I2cExpander* ByteBoiImpl::getExpander(){
 	return expander;
 }
 
-InputI2C* NibbleImpl::getInput(){
+InputI2C* ByteBoiImpl::getInput(){
 	return input;
 }
