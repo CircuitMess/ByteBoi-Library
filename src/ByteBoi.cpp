@@ -1,4 +1,5 @@
 #include "ByteBoi.h"
+#include <SPIFFS.h>
 
 ByteBoiImpl ByteBoi;
 
@@ -20,6 +21,13 @@ void ByteBoiImpl::begin(){
 	Piezo.begin(BUZZ_PIN);
 }
 
+void ByteBoi::setDataRoot(String dataRoot){
+	ByteBoi::dataRoot = dataRoot;
+}
+
+void ByteBoi::open(String path, const char* mode){
+	SPIFFS.open(String(dataRoot + path), mode);
+}
 Display* ByteBoiImpl::getDisplay(){
 	return display;
 }

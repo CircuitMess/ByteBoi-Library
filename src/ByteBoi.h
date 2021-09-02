@@ -3,6 +3,7 @@
 
 #include "Pins.hpp"
 
+#include <Arduino.h>
 #include <CircuitOS.h>
 #include <Display/Display.h>
 #include <Display/Sprite.h>
@@ -12,6 +13,11 @@
 
 class ByteBoiImpl {
 public:
+	ByteBoi();
+
+	void setDataRoot(String dataRoot);
+
+	void open(String path, const char* mode);
 
 	/**
 	 * Initializes display, backlight, Piezo, I2C expander, I2C input, and pre-registers all buttons.
@@ -23,6 +29,7 @@ public:
 	InputI2C* getInput();
 
 private:
+	String dataRoot;
 	Display* display;
 	I2cExpander* expander;
 	InputI2C* input;
