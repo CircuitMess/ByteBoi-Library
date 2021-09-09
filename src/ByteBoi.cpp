@@ -18,14 +18,14 @@ void ByteBoiImpl::begin(){
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
 
-	Piezo.begin(BUZZ_PIN);
+	//Piezo.begin(BUZZ_PIN);
 }
 
-void ByteBoi::setDataRoot(String dataRoot){
-	ByteBoi::dataRoot = dataRoot;
+void ByteBoiImpl::setDataRoot(String dataRoot){
+	ByteBoiImpl::dataRoot = dataRoot;
 }
 
-void ByteBoi::open(String path, const char* mode){
+void ByteBoiImpl::open(String path, const char* mode){
 	SPIFFS.open(String(dataRoot + path), mode);
 }
 Display* ByteBoiImpl::getDisplay(){
