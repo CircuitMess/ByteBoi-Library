@@ -4,7 +4,7 @@
 ByteBoiImpl ByteBoi;
 
 void ByteBoiImpl::begin(){
-	display = new Display(128, 128, -1, 0);
+	display = new Display(160, 120, -1, 1);
 	expander = new I2cExpander();
 
 	display->begin();
