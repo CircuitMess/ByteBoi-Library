@@ -11,9 +11,9 @@ void ByteBoiImpl::begin(){
 	display->getBaseSprite()->clear(TFT_BLACK);
 	display->commit();
 
-	expander->begin(0x74, 4, 5);
+	expander->begin(0x74, 23, 22);
 	expander->pinMode(BL_PIN, OUTPUT);
-	expander->pinWrite(BL_PIN, 1);
+	expander->pinWrite(BL_PIN, 0);
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
