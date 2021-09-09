@@ -4,6 +4,16 @@
 ByteBoiImpl ByteBoi;
 
 void ByteBoiImpl::begin(){
+	if(psramFound()){
+		Serial.printf("PSRAM init: %s, free: %d B\n", psramInit() ? "Yes" : "No", ESP.getFreePsram());
+	}else{
+		Serial.println("No PSRAM detected");
+	}
+	if(!SPIFFS.begin()){
+		Serial.println("SPIFFS error");
+		for(;;);
+	}
+
 	display = new Display(160, 120, -1, 1);
 	expander = new I2cExpander();
 
