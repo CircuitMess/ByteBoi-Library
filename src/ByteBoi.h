@@ -1,7 +1,21 @@
-#ifndef NIBBLE_NIBBLE_H
-#define NIBBLE_NIBBLE_H
+#ifndef BYTEBOI_H
+#define BYTEBOI_H
 
-#include "Pins.hpp"
+#define BTN_UP 0
+#define BTN_DOWN 3
+#define BTN_LEFT 1
+#define BTN_RIGHT 2
+#define BTN_A 6
+#define BTN_B 5
+#define BTN_C 4
+
+#define BUZZ_PIN 12
+#define BL_PIN 12
+
+#define LED_G 13
+#define LED_B 15
+#define LED_R 14
+#define TT1 &TomThumb
 
 #include <Arduino.h>
 #include <CircuitOS.h>
@@ -13,7 +27,6 @@
 
 class ByteBoiImpl {
 public:
-	ByteBoi();
 
 	void setDataRoot(String dataRoot);
 
@@ -38,4 +51,4 @@ private:
 
 extern ByteBoiImpl ByteBoi;
 
-#endif //NIBBLE_NIBBLE_H
+#endif //BYTEBOI_H
