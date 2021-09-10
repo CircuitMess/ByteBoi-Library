@@ -135,3 +135,8 @@ fs::File ByteBoiImpl::getIcon(const char* game){
 bool ByteBoiImpl::inFirmware(){
 	return (esp_partition_find_first(ESP_PARTITION_TYPE_APP , ESP_PARTITION_SUBTYPE_APP_OTA_1, NULL) != NULL);
 }
+
+const std::vector <std::string> &ByteBoiImpl::getGameNames(){
+	return gameNames;
+}
+

@@ -53,6 +53,7 @@ public:
 	std::vector<std::string>& scanGames();
 	fs::File getIcon(const char* game);
 	bool inFirmware();
+	static const std::vector <std::string> &getGameNames();
 
 private:
 	String dataRoot;
@@ -60,7 +61,6 @@ private:
 	I2cExpander* expander;
 	InputI2C* input;
 	static std::vector<std::string> gameNames;
-
 };
 
 extern ByteBoiImpl ByteBoi;
