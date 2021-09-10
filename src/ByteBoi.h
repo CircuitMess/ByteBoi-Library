@@ -17,6 +17,12 @@
 #define LED_R 14
 #define TT1 &TomThumb
 
+#define SPI_SCK 26
+#define SPI_MISO 5
+#define SPI_MOSI 32
+#define SPI_SS -1
+#define SD_CS 2
+
 #include <Arduino.h>
 #include <CircuitOS.h>
 #include <Display/Display.h>
@@ -24,6 +30,8 @@
 #include <Input/I2cExpander.h>
 #include <Input/InputI2C.h>
 #include <Audio/Piezo.h>
+#include <vector>
+#include <FS.h>
 
 class ByteBoiImpl {
 public:
@@ -41,11 +49,17 @@ public:
 	I2cExpander* getExpander();
 	InputI2C* getInput();
 
+	void loadGame(const char* game);
+	std::vector<std::string>& scanGames();
+	fs::File getIcon(const char* game);
+	bool inFirmware();
+
 private:
 	String dataRoot;
 	Display* display;
 	I2cExpander* expander;
 	InputI2C* input;
+	static std::vector<std::string> gameNames;
 
 };
 

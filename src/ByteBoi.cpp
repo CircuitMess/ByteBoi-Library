@@ -1,7 +1,12 @@
 #include "ByteBoi.h"
 #include <SPIFFS.h>
+#include "SD_OTA.h"
+#include <SD.h>
+#include <SPI.h>
+#include <esp_partition.h>
 
 ByteBoiImpl ByteBoi;
+std::vector<std::string> ByteBoiImpl::gameNames;
 
 void ByteBoiImpl::begin(){
 	if(psramFound()){
@@ -13,6 +18,14 @@ void ByteBoiImpl::begin(){
 		Serial.println("SPIFFS error");
 		for(;;);
 	}
+
+	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
+	SPI.setFrequency(60000000);
+	if(!SD.begin(SD_CS, SPI)){
+		Serial.println("No SD card");
+		//for(;;);
+	}
+	Serial.println("SD ok");
 
 	display = new Display(160, 120, -1, 1);
 	expander = new I2cExpander();
@@ -48,4 +61,77 @@ I2cExpander* ByteBoiImpl::getExpander(){
 
 InputI2C* ByteBoiImpl::getInput(){
 	return input;
+}
+
+void ByteBoiImpl::loadGame(const char* game){
+	if(!inFirmware()) return;
+
+	File root = SD.open(game);
+	File file = root.openNextFile();
+
+	while(file){
+		if(strstr(file.name(), ".bin") == nullptr || strstr(file.name(), ".BIN") == nullptr ||
+		   strstr(file.name(), ".icon") == nullptr || strstr(file.name(), ".ICON") == nullptr){
+
+			File destFile = SPIFFS.open(file.name(), FILE_WRITE);
+			uint8_t buf[512];
+			while(file.read(buf, 512)){
+				destFile.write(buf, 512);
+			}
+			destFile.close();
+		}
+		file = root.openNextFile();
+	}
+
+	char path[100];
+	strncpy(path, "/", 100);
+	strncat(path, game, 100);
+	strncat(path, "/", 100);
+	strncat(path, game, 100);
+	strncat(path, ".bin", 100);
+	if(SD.exists(path)){
+		Serial.print("exists: ");
+		Serial.println(path);
+	}
+	SD_OTA::updateFromSD(path);
+
+}
+
+std::vector<std::string> &ByteBoiImpl::scanGames(){
+	gameNames.clear();
+	File root = SD.open("/");
+	File gameFolder = root.openNextFile();
+	while(gameFolder){
+		if(gameFolder.isDirectory()){
+			char path[100];
+			strncpy(path, gameFolder.name(), 100);
+			strncat(path, gameFolder.name(), 100);
+			strncat(path, ".bin", 100);
+
+			if(SD.exists(path)){
+
+				gameNames.emplace_back(gameFolder.name() + 1);
+				Serial.print("exists: ");
+				Serial.println(gameFolder.name() + 1);
+			}
+		}
+
+		gameFolder = root.openNextFile();
+	}
+	return gameNames;
+}
+
+fs::File ByteBoiImpl::getIcon(const char* game){
+	char path[100];
+	strncpy(path, "/", 100);
+	strncat(path, game, 100);
+	strncat(path, "/", 100);
+	strncat(path, game, 100);
+	strncat(path, ".icon", 100);
+	Serial.println(path);
+	return SD.open(path);
+}
+
+bool ByteBoiImpl::inFirmware(){
+	return (esp_partition_find_first(ESP_PARTITION_TYPE_APP , ESP_PARTITION_SUBTYPE_APP_OTA_1, NULL) != NULL);
 }

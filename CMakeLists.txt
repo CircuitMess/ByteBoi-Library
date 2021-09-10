@@ -45,9 +45,7 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/tools/sdk/incl
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/tools/sdk/include/spi_flash)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/tools/sdk/include/esp32-camera/)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/SPIFFS/src)
-
-
-include_directories(${ArduinoLibs}/OpenCV-ESP32/src)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/Update/src)
 
 
 
