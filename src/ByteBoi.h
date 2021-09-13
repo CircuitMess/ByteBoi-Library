@@ -54,6 +54,7 @@ public:
 	fs::File getIcon(const char* game);
 	bool inFirmware();
 	static const std::vector <std::string> &getGameNames();
+	void backToLauncher();
 
 private:
 	String dataRoot;

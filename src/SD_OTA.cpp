@@ -55,4 +55,5 @@ void SD_OTA::updateFromSD(const char* path){
 	else {
 		Serial.println("Could not load update.bin from sd root");
 	}
+	ESP.restart();
 }

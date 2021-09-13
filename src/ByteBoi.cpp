@@ -4,6 +4,7 @@
 #include <SD.h>
 #include <SPI.h>
 #include <esp_partition.h>
+#include <esp_ota_ops.h>
 
 ByteBoiImpl ByteBoi;
 std::vector<std::string> ByteBoiImpl::gameNames;
@@ -131,5 +132,14 @@ bool ByteBoiImpl::inFirmware(){
 
 const std::vector <std::string> &ByteBoiImpl::getGameNames(){
 	return gameNames;
+}
+
+void ByteBoiImpl::backToLauncher(){
+	if(strcmp(esp_ota_get_boot_partition()->label, "app0") == 0) return; //already in launcher partition
+
+	const esp_partition_t *partition = esp_ota_get_running_partition();
+	const esp_partition_t *partition2 = esp_ota_get_next_update_partition(partition);
+	esp_ota_set_boot_partition(partition2);
+	ESP.restart();
 }
 
