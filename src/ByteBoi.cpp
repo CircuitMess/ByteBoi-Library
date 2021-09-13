@@ -89,10 +89,6 @@ void ByteBoiImpl::loadGame(const char* game){
 	strncat(path, "/", 100);
 	strncat(path, game, 100);
 	strncat(path, ".bin", 100);
-	if(SD.exists(path)){
-		Serial.print("exists: ");
-		Serial.println(path);
-	}
 	SD_OTA::updateFromSD(path);
 
 }
@@ -111,8 +107,6 @@ std::vector<std::string> &ByteBoiImpl::scanGames(){
 			if(SD.exists(path)){
 
 				gameNames.emplace_back(gameFolder.name() + 1);
-				Serial.print("exists: ");
-				Serial.println(gameFolder.name() + 1);
 			}
 		}
 
@@ -128,7 +122,6 @@ fs::File ByteBoiImpl::getIcon(const char* game){
 	strncat(path, "/", 100);
 	strncat(path, game, 100);
 	strncat(path, ".icon", 100);
-	Serial.println(path);
 	return SD.open(path);
 }
 
