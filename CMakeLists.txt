@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
-project(ByteBoi)
-set(PORT /dev/ttyS5)
+project(ByteBoi-Library)
+set(PORT /dev/ttyS7)
 set(DEVICE cm:esp32:wheelson)
 set(CMAKE_CXX_STANDARD 11)
 
@@ -47,6 +47,7 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/tools/sdk/incl
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/SPIFFS/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/Update/src)
 
+include_directories(${ArduinoLibs}/cpp-properties/src)
 
 
 file(GLOB_RECURSE SOURCES "src/**.cpp" "src/**.c" "src/**.hpp" "src/**.h")

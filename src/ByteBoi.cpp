@@ -5,9 +5,15 @@
 #include <SPI.h>
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
+#include <PropertiesParser.h>
+#include <iostream>
+#include "GameDefaults.hpp"
+
+using namespace std;
+using namespace cppproperties;
 
 ByteBoiImpl ByteBoi;
-std::vector<std::string> ByteBoiImpl::gameNames;
+std::vector<Properties> ByteBoiImpl::games;
 
 void ByteBoiImpl::begin(){
 	if(psramFound()){
@@ -24,9 +30,10 @@ void ByteBoiImpl::begin(){
 	SPI.setFrequency(60000000);
 	if(!SD.begin(SD_CS, SPI)){
 		Serial.println("No SD card");
-		//for(;;);
+		for(;;);
 	}
 	Serial.println("SD ok");
+	scanGames();
 
 	display = new Display(160, 120, -1, 1);
 	expander = new I2cExpander();
@@ -94,52 +101,95 @@ void ByteBoiImpl::loadGame(const char* game){
 
 }
 
-std::vector<std::string> &ByteBoiImpl::scanGames(){
-	gameNames.clear();
+void ByteBoiImpl::scanGames(){
+	games.clear();
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
 	while(gameFolder){
 		if(gameFolder.isDirectory()){
-			char path[100];
-			strncpy(path, gameFolder.name(), 100);
+			char path[100] = {0};
 			strncat(path, gameFolder.name(), 100);
-			strncat(path, ".bin", 100);
+			strncat(path, "/game.properties", 100);
 
 			if(SD.exists(path)){
+				strncpy(path, "/sd", 100);
+				strncat(path, gameFolder.name(), 100);
+				strncat(path, "/game.properties", 100);
 
-				gameNames.emplace_back(gameFolder.name() + 1);
+				Properties props = PropertiesParser::Read(path);
+				std::string binaryPath = props.GetProperty("Binary");
+				if(binaryPath == "") binaryPath = "firmware.bin";
+				Serial.println(binaryPath.c_str());
+				memset(path, 0, 100);
+				strncat(path, gameFolder.name(), 100);
+				strncat(path, "/", 100);
+				strncat(path, binaryPath.c_str(), 100);
+				Serial.printf("binary path: %s\n", path);
+
+				if(SD.exists(path)){
+					games.push_back(props);
+				}
 			}
 		}
-
 		gameFolder = root.openNextFile();
 	}
-	return gameNames;
+	root.close();
+	gameFolder.close();
 }
 
-fs::File ByteBoiImpl::getIcon(const char* game){
-	char path[100];
-	strncpy(path, "/", 100);
-	strncat(path, game, 100);
+fs::File ByteBoiImpl::getIcon(size_t index){
+	if(index >= games.size()) return fs::File();
+
+	char path[100] = {0};
 	strncat(path, "/", 100);
-	strncat(path, game, 100);
-	strncat(path, ".icon", 100);
+	strncat(path, getGameName(index), 100);
+	strncat(path, "/", 100);
+	if(games[index].GetProperty("Icon", gameDefaults.icon).empty()){
+		strncat(path, gameDefaults.icon, 100);
+	}else{
+		strncat(path, games[index].GetProperty("Icon", gameDefaults.icon).c_str(), 100);
+	}
 	return SD.open(path);
 }
 
 bool ByteBoiImpl::inFirmware(){
-	return (esp_partition_find_first(ESP_PARTITION_TYPE_APP , ESP_PARTITION_SUBTYPE_APP_OTA_1, NULL) != NULL);
-}
-
-const std::vector <std::string> &ByteBoiImpl::getGameNames(){
-	return gameNames;
+	return (strcmp(esp_ota_get_boot_partition()->label, "app0") == 0); //already in launcher partition
 }
 
 void ByteBoiImpl::backToLauncher(){
-	if(strcmp(esp_ota_get_boot_partition()->label, "app0") == 0) return; //already in launcher partition
+	if(inFirmware()) return;
 
 	const esp_partition_t *partition = esp_ota_get_running_partition();
 	const esp_partition_t *partition2 = esp_ota_get_next_update_partition(partition);
 	esp_ota_set_boot_partition(partition2);
 	ESP.restart();
+}
+
+const std::vector<Properties> &ByteBoiImpl::getGameProperties(){
+	return games;
+}
+
+const char* ByteBoiImpl::getGameName(size_t index){
+	if(index >= games.size()) return nullptr;
+	if(games[index].GetProperty("Name", gameDefaults.name).empty()){
+		return gameDefaults.name;
+	}
+	return games[index].GetProperty("Name", gameDefaults.name).c_str();
+}
+
+const char* ByteBoiImpl::getGameBinary(size_t index){
+	if(index >= games.size()) return nullptr;
+	if(games[index].GetProperty("Binary", gameDefaults.binary).empty()){
+		return gameDefaults.binary;
+	}
+	return games[index].GetProperty("Binary", gameDefaults.binary).c_str();
+}
+
+const char* ByteBoiImpl::getGameResources(size_t index){
+	if(index >= games.size()) return nullptr;
+	if(games[index].GetProperty("Resources", gameDefaults.resources).empty()){
+		return gameDefaults.resources;
+	}
+	return games[index].GetProperty("Resources", gameDefaults.resources).c_str();
 }
 

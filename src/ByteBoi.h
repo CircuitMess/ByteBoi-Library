@@ -32,6 +32,9 @@
 #include <Audio/Piezo.h>
 #include <vector>
 #include <FS.h>
+#include <Properties.h>
+
+using namespace cppproperties;
 
 class ByteBoiImpl {
 public:
@@ -50,18 +53,22 @@ public:
 	InputI2C* getInput();
 
 	void loadGame(const char* game);
-	std::vector<std::string>& scanGames();
-	fs::File getIcon(const char* game);
+	void scanGames();
 	bool inFirmware();
-	static const std::vector <std::string> &getGameNames();
 	void backToLauncher();
+	static const std::vector<Properties> &getGameProperties();
+
+	const char* getGameName(size_t index);
+	fs::File getIcon(size_t index);
+	const char* getGameBinary(size_t index);
+	const char* getGameResources(size_t index);
 
 private:
 	String dataRoot;
 	Display* display;
 	I2cExpander* expander;
 	InputI2C* input;
-	static std::vector<std::string> gameNames;
+	static std::vector<Properties> games;
 };
 
 extern ByteBoiImpl ByteBoi;
