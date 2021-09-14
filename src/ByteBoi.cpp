@@ -9,6 +9,8 @@
 #include <iostream>
 #include "GameDefaults.hpp"
 
+const char* SPIFFSgameRoot = "/game/";
+const char* SPIFFSdataRoot = "/data/";
 using namespace std;
 using namespace cppproperties;
 
@@ -52,13 +54,20 @@ void ByteBoiImpl::begin(){
 	//Piezo.begin(BUZZ_PIN);
 }
 
-void ByteBoiImpl::setDataRoot(String dataRoot){
-	ByteBoiImpl::dataRoot = dataRoot;
+File ByteBoiImpl::openResource(String path, const char* mode){
+	if(!SPIFFS.exists(SPIFFSgameRoot) || !SPIFFS.exists(path)) return File();
+	return SPIFFS.open(String(SPIFFSgameRoot) + path, mode);
 }
 
-void ByteBoiImpl::open(String path, const char* mode){
-	SPIFFS.open(String(dataRoot + path), mode);
+File ByteBoiImpl::openData(String path, const char* mode){
+	if(gameID.length() == 0) return File(); //undefined game ID
+
+	if(!SPIFFS.exists(SPIFFSdataRoot)){
+		SPIFFS.mkdir(SPIFFSdataRoot + gameID + "/");
+	}
+	return SPIFFS.open(SPIFFSdataRoot + gameID + "/" + path, mode);
 }
+
 Display* ByteBoiImpl::getDisplay(){
 	return display;
 }
@@ -75,10 +84,10 @@ void ByteBoiImpl::loadGame(size_t index){
 	if(!inFirmware()) return;
 	if(index >= games.size()) return;
 
-	if(!SPIFFS.exists("/game/")){
-		SPIFFS.mkdir("/game/");
+	if(!SPIFFS.exists(SPIFFSgameRoot)){
+		SPIFFS.mkdir(SPIFFSgameRoot);
 	}
-	File root = SPIFFS.open("/game/");
+	File root = SPIFFS.open(SPIFFSgameRoot);
 	File file = root.openNextFile();
 
 	while(file){
@@ -99,7 +108,7 @@ void ByteBoiImpl::loadGame(size_t index){
 		while(file){
 			String fileName = file.name();
 			fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
-			File destFile = SPIFFS.open(String("/game/") + fileName, FILE_WRITE);
+			File destFile = SPIFFS.open(String(SPIFFSgameRoot) + fileName, FILE_WRITE);
 			uint8_t buf[512];
 			while(file.read(buf, 512)){
 				destFile.write(buf, 512);
@@ -136,12 +145,12 @@ void ByteBoiImpl::scanGames(){
 				strncat(path, "/game.properties", 100);
 
 				Properties props = PropertiesParser::Read(path);
+				std::string binaryPath = props.GetProperty("Binary");
+				if(binaryPath == "") binaryPath = "firmware.bin";
 				memset(path, 0, 100);
 				strncat(path, gameFolder.name(), 100);
 				strncat(path, "/", 100);
-				strncat(path, getGameBinary(counter), 100);
-				Serial.printf("binary path: %s\n", path);
-
+				strncat(path, binaryPath.c_str(), 100);
 				if(SD.exists(path)){
 					games.push_back(props);
 				}

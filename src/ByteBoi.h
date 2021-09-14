@@ -1,28 +1,6 @@
 #ifndef BYTEBOI_H
 #define BYTEBOI_H
 
-#define BTN_UP 0
-#define BTN_DOWN 3
-#define BTN_LEFT 1
-#define BTN_RIGHT 2
-#define BTN_A 6
-#define BTN_B 5
-#define BTN_C 4
-
-#define BUZZ_PIN 12
-#define BL_PIN 12
-
-#define LED_G 13
-#define LED_B 15
-#define LED_R 14
-#define TT1 &TomThumb
-
-#define SPI_SCK 26
-#define SPI_MISO 5
-#define SPI_MOSI 32
-#define SPI_SS -1
-#define SD_CS 2
-
 #include <Arduino.h>
 #include <CircuitOS.h>
 #include <Display/Display.h>
@@ -33,42 +11,45 @@
 #include <vector>
 #include <FS.h>
 #include <Properties.h>
+#include "Pins.hpp"
 
 using namespace cppproperties;
 
 class ByteBoiImpl {
 public:
 
-	void setDataRoot(String dataRoot);
-
-	void open(String path, const char* mode);
 
 	/**
 	 * Initializes display, backlight, Piezo, I2C expander, I2C input, and pre-registers all buttons.
 	 */
 	void begin();
-
 	Display* getDisplay();
 	I2cExpander* getExpander();
 	InputI2C* getInput();
 
+	//functions used by the launcher/firmware
 	void loadGame(size_t index);
 	void scanGames();
 	bool inFirmware();
 	void backToLauncher();
 	static const std::vector<Properties> &getGameProperties();
-
 	const char* getGameName(size_t index);
 	fs::File getIcon(size_t index);
 	const char* getGameBinary(size_t index);
 	const char* getGameResources(size_t index);
 
+	//functions to be used by games
+	File openResource(String path, const char* mode);
+	File openData(String path, const char* mode);
+	void setGameID(String ID);
+
+
 private:
-	String dataRoot;
 	Display* display;
 	I2cExpander* expander;
 	InputI2C* input;
 	static std::vector<Properties> games;
+	String gameID = "";
 };
 
 extern ByteBoiImpl ByteBoi;
