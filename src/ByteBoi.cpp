@@ -71,40 +71,59 @@ InputI2C* ByteBoiImpl::getInput(){
 	return input;
 }
 
-void ByteBoiImpl::loadGame(const char* game){
+void ByteBoiImpl::loadGame(size_t index){
 	if(!inFirmware()) return;
+	if(index >= games.size()) return;
 
-	File root = SD.open(game);
+	if(!SPIFFS.exists("/game/")){
+		SPIFFS.mkdir("/game/");
+	}
+	File root = SPIFFS.open("/game/");
 	File file = root.openNextFile();
 
 	while(file){
-		if(strstr(file.name(), ".bin") == nullptr || strstr(file.name(), ".BIN") == nullptr ||
-		   strstr(file.name(), ".icon") == nullptr || strstr(file.name(), ".ICON") == nullptr){
+		SPIFFS.remove(file.name());
+		file = root.openNextFile();
+	}
+	file.close();
+	root.close();
 
-			File destFile = SPIFFS.open(file.name(), FILE_WRITE);
+	char path[100];
+	strncpy(path, "/", 100);
+	strncat(path, getGameName(index), 100);
+	strncat(path, "/", 100);
+	strncat(path, getGameResources(index), 100);
+	if(SD.exists(path)){
+		root = SD.open(path);
+		file = root.openNextFile();
+		while(file){
+			String fileName = file.name();
+			fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+			File destFile = SPIFFS.open(String("/game/") + fileName, FILE_WRITE);
 			uint8_t buf[512];
 			while(file.read(buf, 512)){
 				destFile.write(buf, 512);
 			}
 			destFile.close();
+			file = root.openNextFile();
 		}
-		file = root.openNextFile();
+		file.close();
+		root.close();
 	}
-
-	char path[100];
+	memset(path, 0, 100);
 	strncpy(path, "/", 100);
-	strncat(path, game, 100);
+	strncat(path, getGameName(index), 100);
 	strncat(path, "/", 100);
-	strncat(path, game, 100);
-	strncat(path, ".bin", 100);
-	SD_OTA::updateFromSD(path);
+	strncat(path, getGameBinary(index), 100);
 
+	SD_OTA::updateFromSD(path);
 }
 
 void ByteBoiImpl::scanGames(){
 	games.clear();
 	File root = SD.open("/");
 	File gameFolder = root.openNextFile();
+	size_t counter = 0;
 	while(gameFolder){
 		if(gameFolder.isDirectory()){
 			char path[100] = {0};
@@ -117,13 +136,10 @@ void ByteBoiImpl::scanGames(){
 				strncat(path, "/game.properties", 100);
 
 				Properties props = PropertiesParser::Read(path);
-				std::string binaryPath = props.GetProperty("Binary");
-				if(binaryPath == "") binaryPath = "firmware.bin";
-				Serial.println(binaryPath.c_str());
 				memset(path, 0, 100);
 				strncat(path, gameFolder.name(), 100);
 				strncat(path, "/", 100);
-				strncat(path, binaryPath.c_str(), 100);
+				strncat(path, getGameBinary(counter), 100);
 				Serial.printf("binary path: %s\n", path);
 
 				if(SD.exists(path)){
@@ -132,6 +148,7 @@ void ByteBoiImpl::scanGames(){
 			}
 		}
 		gameFolder = root.openNextFile();
+		counter++;
 	}
 	root.close();
 	gameFolder.close();

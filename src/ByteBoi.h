@@ -52,7 +52,7 @@ public:
 	I2cExpander* getExpander();
 	InputI2C* getInput();
 
-	void loadGame(const char* game);
+	void loadGame(size_t index);
 	void scanGames();
 	bool inFirmware();
 	void backToLauncher();
