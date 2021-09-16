@@ -9,7 +9,7 @@
 #define BTN_B 5
 #define BTN_C 4
 
-#define BUZZ_PIN 12
+#define SPEAKER_PIN 25
 #define BL_PIN 12
 
 #define LED_G 13
