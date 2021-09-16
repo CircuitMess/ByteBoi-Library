@@ -1,5 +1,16 @@
 #include "ByteBoi.h"
 #include <SPIFFS.h>
+#include <SD.h>
+#include <SPI.h>
+#include <esp_partition.h>
+#include <esp_ota_ops.h>
+#include <PropertiesParser.h>
+#include <iostream>
+#include <utility>
+
+const char* ByteBoiImpl::SPIFFSgameRoot = "/game/";
+const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
+using namespace std;
 
 ByteBoiImpl ByteBoi;
 
@@ -11,8 +22,18 @@ void ByteBoiImpl::begin(){
 	}
 	if(!SPIFFS.begin()){
 		Serial.println("SPIFFS error");
+		SPIFFS.begin(true);
+		ESP.restart();
+//		for(;;);
+	}
+
+	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
+	SPI.setFrequency(60000000);
+	if(!SD.begin(SD_CS, SPI)){
+		Serial.println("No SD card");
 		for(;;);
 	}
+	Serial.println("SD ok");
 
 	display = new Display(160, 120, -1, 1);
 	expander = new I2cExpander();
@@ -31,13 +52,33 @@ void ByteBoiImpl::begin(){
 	//Piezo.begin(BUZZ_PIN);
 }
 
-void ByteBoiImpl::setDataRoot(String dataRoot){
-	ByteBoiImpl::dataRoot = dataRoot;
+File ByteBoiImpl::openResource(const String& path, const char* mode){
+	if(!SPIFFS.exists(SPIFFSgameRoot) || !SPIFFS.exists(path)) return File();
+	return SPIFFS.open(String(SPIFFSgameRoot) + path, mode);
 }
 
-void ByteBoiImpl::open(String path, const char* mode){
-	SPIFFS.open(String(dataRoot + path), mode);
+File ByteBoiImpl::openData(const String& path, const char* mode){
+	if(gameID.length() == 0) return File(); //undefined game ID
+
+	if(!SPIFFS.exists(SPIFFSdataRoot)){
+		SPIFFS.mkdir(SPIFFSdataRoot + gameID + "/");
+	}
+	return SPIFFS.open(SPIFFSdataRoot + gameID + "/" + path, mode);
 }
+
+bool ByteBoiImpl::inFirmware(){
+	return (strcmp(esp_ota_get_boot_partition()->label, "app0") == 0); //already in launcher partition
+}
+
+void ByteBoiImpl::backToLauncher(){
+	if(inFirmware()) return;
+
+	const esp_partition_t *partition = esp_ota_get_running_partition();
+	const esp_partition_t *partition2 = esp_ota_get_next_update_partition(partition);
+	esp_ota_set_boot_partition(partition2);
+	ESP.restart();
+}
+
 Display* ByteBoiImpl::getDisplay(){
 	return display;
 }
@@ -49,3 +90,8 @@ I2cExpander* ByteBoiImpl::getExpander(){
 InputI2C* ByteBoiImpl::getInput(){
 	return input;
 }
+
+void ByteBoiImpl::setGameID(String ID){
+	gameID = std::move(ID);
+}
+

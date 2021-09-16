@@ -1,22 +1,6 @@
 #ifndef BYTEBOI_H
 #define BYTEBOI_H
 
-#define BTN_UP 0
-#define BTN_DOWN 3
-#define BTN_LEFT 1
-#define BTN_RIGHT 2
-#define BTN_A 6
-#define BTN_B 5
-#define BTN_C 4
-
-#define SPEAKER_PIN 25
-#define BL_PIN 12
-
-#define LED_G 13
-#define LED_B 15
-#define LED_R 14
-#define TT1 &TomThumb
-
 #include <Arduino.h>
 #include <CircuitOS.h>
 #include <Display/Display.h>
@@ -24,29 +8,36 @@
 #include <Input/I2cExpander.h>
 #include <Input/InputI2C.h>
 #include <Audio/Piezo.h>
+#include <vector>
+#include <FS.h>
+#include "Pins.hpp"
 
 class ByteBoiImpl {
 public:
-
-	void setDataRoot(String dataRoot);
-
-	void open(String path, const char* mode);
 
 	/**
 	 * Initializes display, backlight, Piezo, I2C expander, I2C input, and pre-registers all buttons.
 	 */
 	void begin();
-
 	Display* getDisplay();
 	I2cExpander* getExpander();
 	InputI2C* getInput();
+	static bool inFirmware();
+
+	//functions to be used by games
+	File openResource(const String& path, const char* mode);
+	File openData(const String& path, const char* mode);
+	void setGameID(String ID);
+	void backToLauncher();
+
+	static const char* SPIFFSgameRoot;
+	static const char* SPIFFSdataRoot;
 
 private:
-	String dataRoot;
 	Display* display;
 	I2cExpander* expander;
 	InputI2C* input;
-
+	String gameID = "";
 };
 
 extern ByteBoiImpl ByteBoi;
