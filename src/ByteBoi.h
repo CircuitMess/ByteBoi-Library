@@ -10,14 +10,10 @@
 #include <Audio/Piezo.h>
 #include <vector>
 #include <FS.h>
-#include <Properties.h>
 #include "Pins.hpp"
-
-using namespace cppproperties;
 
 class ByteBoiImpl {
 public:
-
 
 	/**
 	 * Initializes display, backlight, Piezo, I2C expander, I2C input, and pre-registers all buttons.
@@ -26,29 +22,21 @@ public:
 	Display* getDisplay();
 	I2cExpander* getExpander();
 	InputI2C* getInput();
-
-	//functions used by the launcher/firmware
-	void loadGame(size_t index);
-	void scanGames();
-	bool inFirmware();
-	void backToLauncher();
-	static const std::vector<Properties> &getGameProperties();
-	const char* getGameName(size_t index);
-	fs::File getIcon(size_t index);
-	const char* getGameBinary(size_t index);
-	const char* getGameResources(size_t index);
+	static bool inFirmware();
 
 	//functions to be used by games
-	File openResource(String path, const char* mode);
-	File openData(String path, const char* mode);
+	File openResource(const String& path, const char* mode);
+	File openData(const String& path, const char* mode);
 	void setGameID(String ID);
+	void backToLauncher();
 
+	static const char* SPIFFSgameRoot;
+	static const char* SPIFFSdataRoot;
 
 private:
 	Display* display;
 	I2cExpander* expander;
 	InputI2C* input;
-	static std::vector<Properties> games;
 	String gameID = "";
 };
 
