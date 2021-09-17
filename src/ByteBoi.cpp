@@ -55,11 +55,7 @@ void ByteBoiImpl::begin(){
 
 	Context::setDeleteOnPop(true);
 
-	input->setBtnPressCallback(BTN_C, [](){
-		Serial.println("C pressed");
-		Menu* menu = new Menu(Context::getCurrentContext());
-		menu->push(Context::getCurrentContext());
-	});
+	bindMenu();
 
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(!Settings.get().volume);
@@ -107,5 +103,17 @@ InputI2C* ByteBoiImpl::getInput(){
 
 void ByteBoiImpl::setGameID(String ID){
 	gameID = std::move(ID);
+}
+
+void ByteBoiImpl::bindMenu(){
+	input->setBtnPressCallback(BTN_C, [](){
+		Serial.println("C pressed");
+		Menu* menu = new Menu(Context::getCurrentContext());
+		menu->push(Context::getCurrentContext());
+	});
+}
+
+void ByteBoiImpl::unbindMenu(){
+	input->removeBtnPressCallback(BTN_C);
 }
 

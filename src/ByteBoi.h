@@ -29,6 +29,8 @@ public:
 	File openData(const String& path, const char* mode);
 	void setGameID(String ID);
 	void backToLauncher();
+	void bindMenu();
+	void unbindMenu();
 
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
