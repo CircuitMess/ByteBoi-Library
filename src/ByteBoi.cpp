@@ -7,6 +7,8 @@
 #include <PropertiesParser.h>
 #include <iostream>
 #include <utility>
+#include "Menu/Menu.h"
+#include "Settings.h"
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game/";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
@@ -49,7 +51,19 @@ void ByteBoiImpl::begin(){
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
 
-	//Piezo.begin(BUZZ_PIN);
+	Settings.begin();
+
+	Context::setDeleteOnPop(true);
+
+	input->setBtnPressCallback(BTN_C, [](){
+		Serial.println("C pressed");
+		Menu* menu = new Menu(Context::getCurrentContext());
+		menu->push(Context::getCurrentContext());
+	});
+
+	Piezo.begin(SPEAKER_PIN);
+	Piezo.setMute(!Settings.get().volume);
+
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
