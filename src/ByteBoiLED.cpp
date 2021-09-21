@@ -26,7 +26,7 @@ void ByteBoiLED::setRGB(WLEDColor colour){
 	ByteBoi.getExpander()->pinWrite(LED_G, color & 0b10);
 	ByteBoi.getExpander()->pinWrite(LED_B, color & 0b100);
 }
-WLEDColor ByteBoiLED::getRGB(){
+LEDColor ByteBoiLED::getRGB(){
 	return currentColor;
 }
 
