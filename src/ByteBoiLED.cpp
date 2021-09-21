@@ -19,7 +19,7 @@ void ByteBoiLED::begin(){
 	ByteBoi.getExpander()->pinMode(LED_B, OUTPUT);
 }
 
-void ByteBoiLED::setRGB(WLEDColor colour){
+void ByteBoiLED::setRGB(LEDColor colour){
 	currentColor = colour;
 	uint8_t color = rgbMap[(uint8_t)colour];
 	ByteBoi.getExpander()->pinWrite(LED_R, color & 0b1);
