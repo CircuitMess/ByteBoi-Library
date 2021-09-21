@@ -15,6 +15,11 @@ using namespace std;
 ByteBoiImpl ByteBoi;
 
 void ByteBoiImpl::begin(){
+
+	if(!inFirmware()){
+		esp_ota_set_boot_partition(esp_ota_get_next_update_partition(esp_ota_get_running_partition()));
+	}
+
 	if(psramFound()){
 		Serial.printf("PSRAM init: %s, free: %d B\n", psramInit() ? "Yes" : "No", ESP.getFreePsram());
 	}else{
