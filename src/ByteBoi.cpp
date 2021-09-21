@@ -8,6 +8,8 @@
 #include <iostream>
 #include <utility>
 #include "ByteBoiLED.h"
+#include "Menu/Menu.h"
+#include "Settings.h"
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game/";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
@@ -57,7 +59,15 @@ void ByteBoiImpl::begin(){
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
 
-	//Piezo.begin(BUZZ_PIN);
+	Settings.begin();
+
+	Context::setDeleteOnPop(true);
+
+	bindMenu();
+
+	Piezo.begin(SPEAKER_PIN);
+	Piezo.setMute(Settings.get().mute);
+
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
@@ -101,5 +111,21 @@ InputI2C* ByteBoiImpl::getInput(){
 
 void ByteBoiImpl::setGameID(String ID){
 	gameID = std::move(ID);
+}
+
+void ByteBoiImpl::bindMenu(){
+	menuBind = true;
+}
+
+void ByteBoiImpl::unbindMenu(){
+	menuBind = false;
+}
+
+void ByteBoiImpl::buttonPressed(uint i){
+	if(!menuBind) return;
+	if(i == BTN_C){
+		Menu* menu = new Menu(Context::getCurrentContext());
+		menu->push(Context::getCurrentContext());
+	}
 }
 

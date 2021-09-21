@@ -11,8 +11,9 @@
 #include <vector>
 #include <FS.h>
 #include "Pins.hpp"
+#include <Input/InputListener.h>
 
-class ByteBoiImpl {
+class ByteBoiImpl : public InputListener {
 public:
 
 	/**
@@ -29,6 +30,8 @@ public:
 	File openData(const String& path, const char* mode);
 	void setGameID(String ID);
 	void backToLauncher();
+	void bindMenu();
+	void unbindMenu();
 
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
@@ -38,6 +41,8 @@ private:
 	I2cExpander* expander;
 	InputI2C* input;
 	String gameID = "";
+	void buttonPressed(uint i) override;
+	bool menuBind = false;
 };
 
 extern ByteBoiImpl ByteBoi;
