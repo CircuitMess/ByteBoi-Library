@@ -7,6 +7,7 @@
 #include <PropertiesParser.h>
 #include <iostream>
 #include <utility>
+#include "ByteBoiLED.h"
 #include "Menu/Menu.h"
 #include "Settings.h"
 
@@ -47,6 +48,8 @@ void ByteBoiImpl::begin(){
 	expander->begin(0x74, 23, 22);
 	expander->pinMode(BL_PIN, OUTPUT);
 	expander->pinWrite(BL_PIN, 0);
+	LED.begin();
+	LED.setRGB(OFF);
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
