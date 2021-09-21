@@ -19,14 +19,14 @@ void ByteBoiLED::begin(){
 	ByteBoi.getExpander()->pinMode(LED_B, OUTPUT);
 }
 
-void ByteBoiLED::setRGB(WLEDColor colour){
+void ByteBoiLED::setRGB(LEDColor colour){
 	currentColor = colour;
 	uint8_t color = rgbMap[(uint8_t)colour];
 	ByteBoi.getExpander()->pinWrite(LED_R, color & 0b1);
 	ByteBoi.getExpander()->pinWrite(LED_G, color & 0b10);
 	ByteBoi.getExpander()->pinWrite(LED_B, color & 0b100);
 }
-WLEDColor ByteBoiLED::getRGB(){
+LEDColor ByteBoiLED::getRGB(){
 	return currentColor;
 }
 
