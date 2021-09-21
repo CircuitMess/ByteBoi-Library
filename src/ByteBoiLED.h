@@ -3,16 +3,16 @@
 
 #include <Arduino.h>
 
-enum WLEDColor {
+enum LEDColor {
 		OFF, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
 };
 class ByteBoiLED {
 public:
 	void begin();
-	void setRGB(WLEDColor colour);
-	WLEDColor getRGB();
+	void setRGB(LEDColor colour);
+	LEDColor getRGB();
 private:
-	WLEDColor currentColor;
+	LEDColor currentColor;
 
 };
 
