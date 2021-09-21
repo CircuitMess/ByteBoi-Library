@@ -11,6 +11,7 @@
 
 #define SPEAKER_PIN 25
 #define BL_PIN 12
+#define BATTERY_PIN 36
 
 #define LED_G 13
 #define LED_B 15
