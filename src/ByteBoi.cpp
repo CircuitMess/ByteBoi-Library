@@ -58,7 +58,7 @@ void ByteBoiImpl::begin(){
 	bindMenu();
 
 	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(!Settings.get().volume);
+	Piezo.setMute(Settings.get().mute);
 
 }
 
@@ -106,14 +106,18 @@ void ByteBoiImpl::setGameID(String ID){
 }
 
 void ByteBoiImpl::bindMenu(){
-	input->setBtnPressCallback(BTN_C, [](){
-		Serial.println("C pressed");
-		Menu* menu = new Menu(Context::getCurrentContext());
-		menu->push(Context::getCurrentContext());
-	});
+	menuBind = true;
 }
 
 void ByteBoiImpl::unbindMenu(){
-	input->removeBtnPressCallback(BTN_C);
+	menuBind = false;
+}
+
+void ByteBoiImpl::buttonPressed(uint i){
+	if(!menuBind) return;
+	if(i == BTN_C){
+		Menu* menu = new Menu(Context::getCurrentContext());
+		menu->push(Context::getCurrentContext());
+	}
 }
 
