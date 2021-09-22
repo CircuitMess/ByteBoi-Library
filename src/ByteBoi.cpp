@@ -67,6 +67,7 @@ void ByteBoiImpl::begin(){
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().mute);
 
+	ByteBoi.bindMenu();
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
