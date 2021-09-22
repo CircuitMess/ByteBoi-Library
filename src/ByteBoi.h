@@ -42,7 +42,7 @@ private:
 	InputI2C* input;
 	String gameID = "";
 	void buttonPressed(uint i) override;
-	bool menuBind = false;
+	volatile bool menuBind = false;
 };
 
 extern ByteBoiImpl ByteBoi;

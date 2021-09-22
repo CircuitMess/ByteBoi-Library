@@ -58,12 +58,11 @@ void ByteBoiImpl::begin(){
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
+	input->addListener(this);
 
 	Settings.begin();
 
 	Context::setDeleteOnPop(true);
-
-	bindMenu();
 
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().mute);
@@ -85,7 +84,7 @@ File ByteBoiImpl::openData(const String& path, const char* mode){
 }
 
 bool ByteBoiImpl::inFirmware(){
-	return (strcmp(esp_ota_get_boot_partition()->label, "app0") == 0); //already in launcher partition
+	return !(strcmp(esp_ota_get_boot_partition()->label, "app0") == 0); //already in launcher partition
 }
 
 void ByteBoiImpl::backToLauncher(){
@@ -124,6 +123,7 @@ void ByteBoiImpl::unbindMenu(){
 void ByteBoiImpl::buttonPressed(uint i){
 	if(!menuBind) return;
 	if(i == BTN_C){
+		unbindMenu();
 		Menu* menu = new Menu(Context::getCurrentContext());
 		menu->push(Context::getCurrentContext());
 	}

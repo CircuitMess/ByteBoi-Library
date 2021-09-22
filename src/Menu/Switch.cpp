@@ -21,8 +21,8 @@ void Switch::draw(){
 	canvas->fillRect(getTotalX(), getTotalY() + 2, hWidth - lWidth, getHeight() - 4, TFT_DARKGREY);
 	canvas->fillRect(getTotalX() + hWidth - lWidth, getTotalY() + 2, lWidth, getHeight() - 4, TFT_RED);
 
-	canvas->fillRect(getTotalX() + hWidth, getTotalY() + 2, rWidth, getHeight() - 4, TFT_GREEN);
 	canvas->fillRect(getTotalX() + hWidth + rWidth, getTotalY() + 2, hWidth - rWidth, getHeight() - 4, TFT_DARKGREY);
+	canvas->fillRect(getTotalX() + hWidth, getTotalY() + 2, rWidth, getHeight() - 4, TFT_GREEN);
 
 	canvas->fillRect(getTotalX() + 2, getTotalY(), getWidth() - 4, 2, TFT_WHITE);
 	canvas->fillRect(getTotalX() + 2, getTotalY() + getHeight() - 2, getWidth() - 4, 2, TFT_WHITE);
@@ -31,7 +31,7 @@ void Switch::draw(){
 	canvas->fillRect(getTotalX() + getWidth() / 2 - 1, getTotalY(), 2, getHeight(), TFT_WHITE);
 
 	canvas->setTextSize(1);
-	canvas->setFont(&fonts::Font0);
+	canvas->setTextFont(0);
 	canvas->setTextColor(TFT_WHITE);
 
 	canvas->setCursor(getTotalX() + 7, getTotalY() + 7);

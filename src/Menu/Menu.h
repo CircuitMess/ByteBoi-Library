@@ -27,11 +27,11 @@ private:
 	Context* currentContext = nullptr;
 	Color* backgroundBuffer = nullptr;
 
-	LinearLayout layout;
-	TextElement exit;
-	LinearLayout audioLayout;
-	TextElement muteText;
-	Switch audioSwitch;
+	LinearLayout *layout;
+	TextElement *exit;
+	LinearLayout *audioLayout;
+	TextElement *muteText;
+	Switch *audioSwitch;
 
 	float showProgress = 0;
 	bool shown = false;
