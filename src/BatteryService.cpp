@@ -12,7 +12,7 @@ void BatteryService::loop(uint micros){
 	if(measureMicros >= measureInterval * 1000000){
 		measureMicros = 0;
 		float x = analogRead(BATTERY_PIN);
-		voltage = (1.3255 * x - 1.2461);
+		voltage = (1.1 * x + 683);
 		if(getLevel() == 0 && !shutdownDisable){
 			ByteBoi.getExpander()->pinMode(BL_PIN, 1);
 			WiFi.mode(WIFI_OFF);
