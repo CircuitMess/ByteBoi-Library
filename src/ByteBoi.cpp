@@ -16,6 +16,7 @@ const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
 using namespace std;
 
 ByteBoiImpl ByteBoi;
+BatteryService Battery;
 
 void ByteBoiImpl::begin(){
 
@@ -54,7 +55,7 @@ void ByteBoiImpl::begin(){
 	expander->pinMode(BL_PIN, OUTPUT);
 	expander->pinWrite(BL_PIN, 0);
 	LED.begin();
-	LED.setRGB(OFF);
+//	LED.setRGB(OFF);
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
@@ -67,7 +68,7 @@ void ByteBoiImpl::begin(){
 
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().mute);
-
+	Battery.begin();
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
