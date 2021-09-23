@@ -16,6 +16,7 @@ const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
 using namespace std;
 
 ByteBoiImpl ByteBoi;
+Menu* ByteBoiImpl::popupMenu = nullptr;
 
 void ByteBoiImpl::begin(){
 
@@ -123,10 +124,32 @@ void ByteBoiImpl::unbindMenu(){
 
 void ByteBoiImpl::buttonPressed(uint i){
 	if(!menuBind) return;
-	if(i == BTN_C){
-		unbindMenu();
-		Menu* menu = new Menu(Context::getCurrentContext());
-		menu->push(Context::getCurrentContext());
+	if(i == BTN_C || (popupMenu != nullptr && i == BTN_B)){
+		if(ContextTransition::isRunning() || ModalTransition::isRunning()) return;
+
+		if(popupMenu == nullptr){
+			openMenu();
+		}else if(popupMenu != nullptr){
+			Menu::popIntoPrevious();
+			popupMenu = nullptr;
+		}
+	}
+}
+
+void ByteBoiImpl::openMenu(){
+	if(ContextTransition::isRunning() || ModalTransition::isRunning()) return;
+	if(Modal::getCurrentModal() != nullptr){
+		ModalTransition::setDeleteOnPop(false);
+		auto transition = static_cast<ModalTransition *>((void *)Modal::getCurrentModal()->pop());
+		transition->setDoneCallback([](Context *currentContext, Modal *prevModal){
+			ByteBoiImpl::popupMenu = new Menu(currentContext);
+			ByteBoiImpl::popupMenu->push(currentContext);
+			ByteBoiImpl::popupMenu->returned(prevModal);
+			ModalTransition::setDeleteOnPop(true);
+		});
+	}else{
+		ByteBoiImpl::popupMenu = new Menu(Context::getCurrentContext());
+		ByteBoiImpl::popupMenu->push(Context::getCurrentContext());
 	}
 }
 

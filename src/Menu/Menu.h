@@ -20,6 +20,9 @@ public:
 	void start() override;
 	void stop() override;
 
+	void returned(void* data) override;
+	static void popIntoPrevious();
+
 private:
 	static Menu* instance;
 
@@ -48,6 +51,8 @@ private:
 	void buildUI();
 	void bindInput();
 	void releaseInput();
+
+	Modal* prevModal = nullptr;
 };
 
 

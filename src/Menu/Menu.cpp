@@ -22,23 +22,22 @@ Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.inFirm
 		return;
 	}
 
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/background.raw.hs"), 13, 12);
+	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/background.raw.hs"), 13, 12);
 
 	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
 	backgroundFile.close();
 
 	buildUI();
-	audioSwitch->set(Settings.get().volume, true);
+	audioSwitch->set(Settings.get().mute, true);
 }
 Menu::~Menu(){
 	free(backgroundBuffer);
-	ByteBoi.bindMenu();
 }
 
 void Menu::start(){
 	selectElement(0);
 	bindInput();
-	audioSwitch->set(Settings.get().volume, true);
+	audioSwitch->set(Settings.get().mute, true);
 	LoopManager::addListener(this);
 }
 
@@ -51,22 +50,12 @@ void Menu::stop(){
 
 void Menu::bindInput(){
 
-	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
-		if(instance == nullptr) return;
-		instance->pop();
-	});
-
-	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
-		if(instance == nullptr) return;
-		instance->pop();
-	});
-
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->audioSwitch->toggle();
-			Settings.get().volume = instance->audioSwitch->getState();
-			Piezo.setMute(!Settings.get().volume);
+			Settings.get().mute = instance->audioSwitch->getState();
+			Piezo.setMute(!Settings.get().mute);
 			Piezo.tone(500, 50);
 		}else{
 			instance->pop();
@@ -88,8 +77,8 @@ void Menu::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
-			Settings.get().volume = 1;
-			Piezo.setMute(!Settings.get().volume);
+			Settings.get().mute = true;
+			Piezo.setMute(!Settings.get().mute);
 			if(instance->audioSwitch->getState() == false)
 			{
 				Piezo.tone(500, 50);
@@ -102,8 +91,8 @@ void Menu::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->audioSwitch->set(false);
-			Settings.get().volume = 0;
-			Piezo.setMute(!Settings.get().volume);
+			Settings.get().mute = 0;
+			Piezo.setMute(!Settings.get().mute);
 			Piezo.tone(500, 50);
 		}
 	});
@@ -115,8 +104,6 @@ void Menu::releaseInput(){
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
-	Input::getInstance()->removeBtnPressCallback(BTN_B);
-	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
 void Menu::selectElement(uint8_t index){
@@ -191,4 +178,17 @@ void Menu::buildUI(){
 	muteText->setColor(TFT_WHITE);
 
 
+}
+
+void Menu::returned(void* data){
+	prevModal = (Modal*)data;
+}
+
+void Menu::popIntoPrevious(){
+	ModalTransition* transition = static_cast<ModalTransition*>((void*)instance->pop());
+	if(instance->prevModal == nullptr) return;
+	transition->setDoneCallback([](Context* currContext, Modal*){
+		instance->prevModal->push(currContext);
+	});
+//		instance->pop();
 }

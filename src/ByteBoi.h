@@ -13,6 +13,8 @@
 #include "Pins.hpp"
 #include <Input/InputListener.h>
 
+class Menu;
+
 class ByteBoiImpl : public InputListener {
 public:
 
@@ -32,6 +34,7 @@ public:
 	void backToLauncher();
 	void bindMenu();
 	void unbindMenu();
+	void openMenu();
 
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
@@ -43,6 +46,8 @@ private:
 	String gameID = "";
 	void buttonPressed(uint i) override;
 	volatile bool menuBind = false;
+
+	static Menu* popupMenu;
 };
 
 extern ByteBoiImpl ByteBoi;
