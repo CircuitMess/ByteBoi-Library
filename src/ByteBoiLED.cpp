@@ -22,9 +22,9 @@ void ByteBoiLED::begin(){
 void ByteBoiLED::setRGB(LEDColor colour){
 	currentColor = colour;
 	uint8_t color = rgbMap[(uint8_t)colour];
-	ByteBoi.getExpander()->pinWrite(LED_R, color & 0b1);
-	ByteBoi.getExpander()->pinWrite(LED_G, color & 0b10);
-	ByteBoi.getExpander()->pinWrite(LED_B, color & 0b100);
+	ByteBoi.getExpander()->pinWrite(LED_R, !(color & 0b1));
+	ByteBoi.getExpander()->pinWrite(LED_G, !(color & 0b10));
+	ByteBoi.getExpander()->pinWrite(LED_B, !(color & 0b100));
 }
 LEDColor ByteBoiLED::getRGB(){
 	return currentColor;
