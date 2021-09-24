@@ -1,5 +1,5 @@
 #include "BatteryService.h"
-#include "ByteBoi.h"
+#include "../ByteBoi.h"
 #include <Support/ContextTransition.h>
 #include <WiFi.h>
 #include <SPIFFS.h>
@@ -13,7 +13,7 @@ void BatteryService::loop(uint micros){
 		measureMicros = 0;
 		float x = analogRead(BATTERY_PIN);
 		voltage = (1.1 * x + 683);
-		if(getLevel() == 0 && !shutdownDisable){
+		if(getLevel() == 0 && !shutdownDisable && !isCharging()){
 			ByteBoi.getExpander()->pinMode(BL_PIN, 1);
 			WiFi.mode(WIFI_OFF);
 			btStop();

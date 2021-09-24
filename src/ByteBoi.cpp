@@ -10,6 +10,8 @@
 #include "ByteBoiLED.h"
 #include "Menu/Menu.h"
 #include "Settings.h"
+#include "Battery/BatteryPopupService.h"
+#include <Loop/LoopManager.h>
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game/";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
@@ -69,6 +71,9 @@ void ByteBoiImpl::begin(){
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().mute);
 	Battery.begin();
+	BatteryPopup.setTFT(display->getTft());
+	LoopManager::addListener(&BatteryPopup);
+	Input::getInstance()->addListener(&BatteryPopup);
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){

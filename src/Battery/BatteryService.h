@@ -27,5 +27,7 @@ private:
 	uint8_t level = 0;
 };
 
+extern BatteryService Battery;
+
 
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H
