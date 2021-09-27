@@ -86,7 +86,7 @@ File ByteBoiImpl::openData(const String& path, const char* mode){
 }
 
 bool ByteBoiImpl::inFirmware(){
-	return (strcmp(esp_ota_get_boot_partition()->label, "app0") == 0); //already in launcher partition
+	return (strcmp(esp_ota_get_running_partition()->label, "launcher") == 0); //already in launcher partition
 }
 
 void ByteBoiImpl::backToLauncher(){
