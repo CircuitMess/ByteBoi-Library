@@ -4,14 +4,12 @@
 #include "ShutdownPopup.h"
 #include "WarningPopup.h"
 #include "BatteryService.h"
+#include "../ByteBoi.h"
 #include <Loop/LoopManager.h>
 
 const uint16_t BatteryPopupService::checkInterval = 5; //in seconds
 ShutdownPopup *BatteryPopupService::shutdownPopup = nullptr;
 WarningPopup *BatteryPopupService::warningPopup = nullptr;
-
-BatteryPopupService BatteryPopup;
-
 
 void BatteryPopupService::loop(uint time){
 	if(!enabled){

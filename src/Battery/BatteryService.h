@@ -30,7 +30,4 @@ private:
 	Color* batteryBuffer[6] = {nullptr};
 };
 
-extern BatteryService Battery;
-
-
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H

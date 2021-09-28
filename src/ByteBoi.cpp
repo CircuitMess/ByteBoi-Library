@@ -22,6 +22,7 @@ using namespace std;
 
 ByteBoiImpl ByteBoi;
 BatteryService Battery;
+BatteryPopupService BatteryPopup;
 
 void ByteBoiImpl::begin(){
 

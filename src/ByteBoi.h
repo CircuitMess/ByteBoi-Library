@@ -13,6 +13,7 @@
 #include "Pins.hpp"
 #include <Input/InputListener.h>
 #include "Battery/BatteryService.h"
+#include "Battery/BatteryPopupService.h"
 
 class ByteBoiImpl : public InputListener {
 public:
@@ -48,7 +49,8 @@ private:
 	bool menuBind = false;
 };
 
-extern BatteryService Battery;
 extern ByteBoiImpl ByteBoi;
+extern BatteryService Battery;
+extern BatteryPopupService BatteryPopup;
 
 #endif //BYTEBOI_H

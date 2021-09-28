@@ -28,5 +28,4 @@ private:
 	bool enabled = false;
 };
 
-extern BatteryPopupService BatteryPopup;
 #endif //BYTEBOI_LIBRARY_BATTERYPOPUPSERVICE_H
