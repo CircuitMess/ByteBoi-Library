@@ -9,6 +9,13 @@ class ShutdownPopup;
 class BatteryPopupService : public LoopListener{
 public:
 	void loop(uint time) override;
+
+	/**
+	 * Enable pop-ups. When enabling, this will disable BatteryService auto-shutdown, but won't re-enable
+	 * it when disabling the pop-ups.
+	 *
+	 * Game should be contained within Contexts for this to work.
+	 */
 	void enablePopups(bool enable);
 
 private:

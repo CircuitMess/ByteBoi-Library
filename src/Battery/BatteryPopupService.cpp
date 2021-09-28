@@ -4,6 +4,7 @@
 #include "ShutdownPopup.h"
 #include "WarningPopup.h"
 #include "BatteryService.h"
+#include <Loop/LoopManager.h>
 
 const uint16_t BatteryPopupService::checkInterval = 5; //in seconds
 ShutdownPopup *BatteryPopupService::shutdownPopup = nullptr;
@@ -13,6 +14,11 @@ BatteryPopupService BatteryPopup;
 
 
 void BatteryPopupService::loop(uint time){
+	if(!enabled){
+		LoopManager::removeListener(this);
+		return;
+	}
+
 	checkMicros += time;
 	//voltage not yet read or charging
 	if(Battery.getVoltage() == 0 || Battery.isCharging()){
@@ -67,6 +73,15 @@ void BatteryPopupService::loop(uint time){
 }
 
 void BatteryPopupService::enablePopups(bool enable){
+	if(enable){
+		Battery.disableShutdown(true);
+	}
+
+	if(enable && !enabled){
+		LoopManager::addListener(this);
+	}else if(!enable && enabled){
+		LoopManager::removeListener(this);
+	}
+
 	enabled = enable;
-	Battery.disableShutdown(enabled);
 }

@@ -74,8 +74,8 @@ void ByteBoiImpl::begin(){
 
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().mute);
+
 	Battery.begin();
-	LoopManager::addListener(&BatteryPopup);
 	LoopManager::addListener(&Sleep);
 	input->addListener(&Sleep);
 
