@@ -48,6 +48,7 @@ private:
 	bool menuBind = false;
 };
 
+extern BatteryService Battery;
 extern ByteBoiImpl ByteBoi;
 
 #endif //BYTEBOI_H
