@@ -44,11 +44,6 @@ void ByteBoiImpl::begin(){
 
 	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
 	SPI.setFrequency(60000000);
-	if(!SD.begin(SD_CS, SPI)){
-		Serial.println("No SD card");
-		for(;;);
-	}
-	Serial.println("SD ok");
 
 	display = new Display(160, 120, -1, 1);
 	expander = new I2cExpander();
