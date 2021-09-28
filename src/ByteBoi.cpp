@@ -7,6 +7,7 @@
 #include <PropertiesParser.h>
 #include <iostream>
 #include <utility>
+#include <Loop/LoopManager.h>
 #include "ByteBoiLED.h"
 #include "Menu/Menu.h"
 #include "Settings.h"
@@ -59,6 +60,7 @@ void ByteBoiImpl::begin(){
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
+	LoopManager::addListener(Input::getInstance());
 
 	Settings.begin();
 
