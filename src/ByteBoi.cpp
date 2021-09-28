@@ -16,8 +16,8 @@
 #include <Loop/LoopManager.h>
 #include <WiFi.h>
 
-const char* ByteBoiImpl::SPIFFSgameRoot = "/game/";
-const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
+const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
+const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
 using namespace std;
 
 ByteBoiImpl ByteBoi;
@@ -82,17 +82,15 @@ void ByteBoiImpl::begin(){
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
-	if(!SPIFFS.exists(SPIFFSgameRoot) || !SPIFFS.exists(path)) return File();
-	return SPIFFS.open(String(SPIFFSgameRoot) + path, mode);
+	String result = String(SPIFFSgameRoot + path);
+	if(!SPIFFS.exists(result)) return File();
+	return SPIFFS.open(result, mode);
 }
 
 File ByteBoiImpl::openData(const String& path, const char* mode){
 	if(gameID.length() == 0) return File(); //undefined game ID
 
-	if(!SPIFFS.exists(SPIFFSdataRoot)){
-		SPIFFS.mkdir(SPIFFSdataRoot + gameID + "/");
-	}
-	return SPIFFS.open(SPIFFSdataRoot + gameID + "/" + path, mode);
+	return SPIFFS.open(String(SPIFFSdataRoot) + "/" + gameID + "/" + path, mode);
 }
 
 bool ByteBoiImpl::inFirmware(){
