@@ -56,6 +56,7 @@ void BatteryService::disableShutdown(bool _shutdown){
 void BatteryService::begin(){
 	LoopManager::addListener(this);
 	ByteBoi.getExpander()->pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
+	pinMode(BATTERY_PIN, INPUT);
 
 	char filename[50];
 	for(uint8_t i = 0; i < 6; i++){
