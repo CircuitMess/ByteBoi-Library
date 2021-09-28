@@ -60,18 +60,22 @@ void BatteryService::begin(){
 	char filename[50];
 	for(uint8_t i = 0; i < 6; i++){
 		batteryBuffer[i] = static_cast<Color*>(ps_malloc((i == 5 ? 6*6*2 : 14 * 6 * 2)));
-		if(batteryBuffer[i] == nullptr){
-			Serial.println("Battery icon, unpack error");
-		}
 
 		if(i == 5){
 			sprintf(filename, "/launcher/chargingIcon.raw");
 		}else{
 			sprintf(filename, "/launcher/battery_%d.raw", i);
 		}
-		fs::File bgFile = SPIFFS.open(filename);
-		bgFile.read(reinterpret_cast<uint8_t*>(batteryBuffer[i]), (i == 5 ? 6*6*2 : 14 * 6 * 2));
-		bgFile.close();
+		fs::File file = SPIFFS.open(filename);
+		if(!file){
+			printf("Failed opening battery: icon %s\n", filename);
+			free(batteryBuffer[i]);
+			batteryBuffer[i] = nullptr;
+			file.close();
+			continue;
+		}
+		file.read(reinterpret_cast<uint8_t*>(batteryBuffer[i]), (i == 5 ? 6 * 6 * 2 : 14 * 6 * 2));
+		file.close();
 	}
 }
 
@@ -80,5 +84,7 @@ bool BatteryService::isCharging() const{
 }
 
 void BatteryService::drawIcon(Sprite &sprite, int16_t x, int16_t y){
-	sprite.drawIcon(batteryBuffer[(isCharging() ? 5 : getLevel())], x, y, (isCharging() ? 6 : 14), 6, 1, TFT_TRANSPARENT);
+	Color* buffer = batteryBuffer[(isCharging() ? 5 : getLevel())];
+	if(buffer == nullptr) return;
+	sprite.drawIcon(buffer, x, y, (isCharging() ? 6 : 14), 6, 1, TFT_TRANSPARENT);
 }
