@@ -68,7 +68,7 @@ void BatteryService::begin(){
 		}
 		fs::File file = SPIFFS.open(filename);
 		if(!file){
-			printf("Failed opening battery: icon %s\n", filename);
+			printf("Failed opening battery icon: %s\n", filename);
 			free(batteryBuffer[i]);
 			batteryBuffer[i] = nullptr;
 			file.close();

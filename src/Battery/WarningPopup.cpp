@@ -1,6 +1,5 @@
 #include "WarningPopup.h"
 #include <Loop/LoopManager.h>
-#include <WiFi.h>
 #include <Support/ModalTransition.h>
 #include <SPIFFS.h>
 
@@ -9,10 +8,16 @@ WarningPopup* WarningPopup::instance = nullptr;
 
 WarningPopup::WarningPopup(Context &context) : Modal(context, 135, 60){
 	instance = this;
-	batteryIconBuffer = static_cast<Color*>(ps_malloc(30 * 30 * 2));
-	fs::File bgFile = SPIFFS.open("/launcher/low.raw");
-	bgFile.read(reinterpret_cast<uint8_t*>(batteryIconBuffer), 30 * 30 * 2);
-	bgFile.close();
+
+	fs::File file = SPIFFS.open("/launcher/low.raw");
+	if(file){
+		batteryIconBuffer = static_cast<Color*>(ps_malloc(30 * 30 * 2));
+		file.read(reinterpret_cast<uint8_t*>(batteryIconBuffer), 30 * 30 * 2);
+		file.close();
+	}else{
+		printf("Failed opening battery icon: /launcher/low.raw\n");
+	}
+
 	screen.getSprite()->setChroma(TFT_TRANSPARENT);
 }
 
@@ -25,7 +30,9 @@ void WarningPopup::draw(){
 
 	sprite.clear(TFT_TRANSPARENT);
 	sprite.fillRoundRect(0, 0, 135, 60, 10, TFT_BLACK);
-	sprite.drawIcon(batteryIconBuffer, 5, 15, 30, 30, 1, TFT_TRANSPARENT);
+	if(batteryIconBuffer != nullptr){
+		sprite.drawIcon(batteryIconBuffer, 5, 15, 30, 30, 1, TFT_TRANSPARENT);
+	}
 	sprite.setTextColor(TFT_WHITE);
 	sprite.setTextSize(1);
 	sprite.setTextFont(2);
