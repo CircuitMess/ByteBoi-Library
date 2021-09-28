@@ -11,6 +11,10 @@
 #include "ByteBoiLED.h"
 #include "Menu/Menu.h"
 #include "Settings.h"
+#include "Battery/BatteryPopupService.h"
+#include "SleepService.h"
+#include <Loop/LoopManager.h>
+#include <WiFi.h>
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
@@ -70,7 +74,11 @@ void ByteBoiImpl::begin(){
 
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().mute);
+
 	Battery.begin();
+	LoopManager::addListener(&Sleep);
+	input->addListener(&Sleep);
+
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
@@ -128,5 +136,15 @@ void ByteBoiImpl::buttonPressed(uint i){
 		Menu* menu = new Menu(Context::getCurrentContext());
 		menu->push(Context::getCurrentContext());
 	}
+}
+
+void ByteBoiImpl::shutdown(){
+	display->getTft()->sleep();
+	expander->pinMode(BL_PIN, 1);
+	LED.setRGB(OFF);
+	WiFi.mode(WIFI_OFF);
+	btStop();
+	Piezo.noTone();
+	esp_deep_sleep_start();
 }
 

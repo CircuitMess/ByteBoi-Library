@@ -12,7 +12,7 @@
 #include <FS.h>
 #include "Pins.hpp"
 #include <Input/InputListener.h>
-#include "BatteryService.h"
+#include "Battery/BatteryService.h"
 
 class ByteBoiImpl : public InputListener {
 public:
@@ -33,6 +33,8 @@ public:
 	void backToLauncher();
 	void bindMenu();
 	void unbindMenu();
+
+	void shutdown();
 
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
