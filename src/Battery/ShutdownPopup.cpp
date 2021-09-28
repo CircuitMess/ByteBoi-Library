@@ -1,7 +1,6 @@
 #include "ShutdownPopup.h"
 #include <Loop/LoopManager.h>
-#include <ByteBoi.h>
-#include <WiFi.h>
+#include "../ByteBoi.h"
 #include <SPIFFS.h>
 
 const uint8_t ShutdownPopup::shutdownTime = 5;
@@ -45,11 +44,7 @@ void ShutdownPopup::stop(){
 void ShutdownPopup::loop(uint micros){
 	shutdownTimer += micros;
 	if(shutdownTimer >= shutdownTime * 1000000){
-		screen.getDisplay()->getTft()->sleep();
-		ByteBoi.getExpander()->pinMode(BL_PIN, 1);
-		WiFi.mode(WIFI_OFF);
-		btStop();
-		esp_deep_sleep_start();
+		ByteBoi.shutdown();
 	}
 }
 

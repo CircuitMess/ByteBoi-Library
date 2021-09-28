@@ -3,11 +3,7 @@
 #include <Support/ModalTransition.h>
 #include "ShutdownPopup.h"
 #include "WarningPopup.h"
-#include <Settings.h>
-#include <Display/Display.h>
-#include <WiFi.h>
 #include "BatteryService.h"
-#include "../ByteBoi.h"
 
 const uint16_t BatteryPopupService::checkInterval = 5; //in seconds
 ShutdownPopup *BatteryPopupService::shutdownPopup = nullptr;
@@ -18,36 +14,12 @@ BatteryPopupService BatteryPopup;
 
 void BatteryPopupService::loop(uint time){
 	checkMicros += time;
-	blinkMicros += time;
-	if(Settings.get().shutdownTime != 0){
-		autoShutdownMicros += time;
-		if(autoShutdownMicros >= Settings.get().shutdownTime*1000000){
-			if(tft != nullptr){
-				tft->sleep();
-			}
-			ByteBoi.getExpander()->pinMode(BL_PIN, 1);
-			WiFi.mode(WIFI_OFF);
-			btStop();
-			esp_deep_sleep_start();
-			return;
-		}
-	}
-	if(lastShutdownTime == (uint32_t)-1){
-		autoShutdownMicros = 0;
-		lastShutdownTime = Settings.get().shutdownTime;
-	}
-	if(lastShutdownTime != Settings.get().shutdownTime){
-		autoShutdownMicros = 0;
-	}
-
-
 	//voltage not yet read or charging
 	if(Battery.getVoltage() == 0 || Battery.isCharging()){
 		warningShown = false;
 		return;
 	}
 	uint8_t percentage = Battery.getPercentage();
-
 
 	if(checkMicros >= checkInterval * 1000000){
 
@@ -92,14 +64,6 @@ void BatteryPopupService::loop(uint time){
 		}
 		checkMicros = 0;
 	}
-}
-
-void BatteryPopupService::setTFT(TFT_eSPI* _tft){
-	tft=_tft;
-}
-
-void BatteryPopupService::anyKeyPressed(){
-	autoShutdownMicros = 0;
 }
 
 void BatteryPopupService::enablePopups(bool enable){

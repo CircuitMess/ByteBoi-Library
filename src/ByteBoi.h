@@ -34,6 +34,8 @@ public:
 	void bindMenu();
 	void unbindMenu();
 
+	void shutdown();
+
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
 

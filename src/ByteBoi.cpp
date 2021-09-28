@@ -11,7 +11,9 @@
 #include "Menu/Menu.h"
 #include "Settings.h"
 #include "Battery/BatteryPopupService.h"
+#include "SleepService.h"
 #include <Loop/LoopManager.h>
+#include <WiFi.h>
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game/";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data/";
@@ -57,7 +59,7 @@ void ByteBoiImpl::begin(){
 	expander->pinMode(BL_PIN, OUTPUT);
 	expander->pinWrite(BL_PIN, 0);
 	LED.begin();
-//	LED.setRGB(OFF);
+	LED.setRGB(OFF);
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
@@ -71,9 +73,10 @@ void ByteBoiImpl::begin(){
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().mute);
 	Battery.begin();
-	BatteryPopup.setTFT(display->getTft());
 	LoopManager::addListener(&BatteryPopup);
-	Input::getInstance()->addListener(&BatteryPopup);
+	LoopManager::addListener(&Sleep);
+	input->addListener(&Sleep);
+
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
@@ -133,5 +136,15 @@ void ByteBoiImpl::buttonPressed(uint i){
 		Menu* menu = new Menu(Context::getCurrentContext());
 		menu->push(Context::getCurrentContext());
 	}
+}
+
+void ByteBoiImpl::shutdown(){
+	display->getTft()->sleep();
+	expander->pinMode(BL_PIN, 1);
+	LED.setRGB(OFF);
+	WiFi.mode(WIFI_OFF);
+	btStop();
+	Piezo.noTone();
+	esp_deep_sleep_start();
 }
 
