@@ -14,10 +14,8 @@ void BatteryService::loop(uint micros){
 		float x = analogRead(BATTERY_PIN);
 		voltage = (1.1 * x + 683);
 		if(getLevel() == 0 && !shutdownDisable && !isCharging()){
-			ByteBoi.getExpander()->pinMode(BL_PIN, 1);
-			WiFi.mode(WIFI_OFF);
-			btStop();
-			esp_deep_sleep_start();
+			ByteBoi.shutdown();
+			return;
 		}
 		measureMicros = 0;
 	}
