@@ -1,15 +1,15 @@
 #include "SettingsElement.h"
 
-SettingsScreen::SettingsElement::SettingsElement(ElementContainer* parent, String name) : CustomElement(parent,160,20), name(name){
+SettingsMiniScreen::SettingsElement::SettingsElement(ElementContainer* parent, String name) : CustomElement(parent, 160, 20), name(name){
 
 }
 
-void SettingsScreen::SettingsElement::setIsSelected(bool isSelected){
+void SettingsMiniScreen::SettingsElement::setIsSelected(bool isSelected){
 	SettingsElement::selected = isSelected;
 
 }
 
-void SettingsScreen::SettingsElement::draw(){
+void SettingsMiniScreen::SettingsElement::draw(){
 	getSprite()->setTextColor(TFT_WHITE);
 	getSprite()->setTextSize(1);
 	getSprite()->setTextFont(1);
@@ -21,6 +21,6 @@ void SettingsScreen::SettingsElement::draw(){
 	drawControl();
 }
 
-bool SettingsScreen::SettingsElement::isSelected() const{
+bool SettingsMiniScreen::SettingsElement::isSelected() const{
 	return selected;
 }
