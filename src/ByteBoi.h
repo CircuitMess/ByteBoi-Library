@@ -12,6 +12,8 @@
 #include <FS.h>
 #include "Pins.hpp"
 #include <Input/InputListener.h>
+#include "Battery/BatteryService.h"
+#include "Battery/BatteryPopupService.h"
 
 class Menu;
 
@@ -36,6 +38,8 @@ public:
 	void unbindMenu();
 	void openMenu();
 
+	void shutdown();
+
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
 
@@ -51,5 +55,7 @@ private:
 };
 
 extern ByteBoiImpl ByteBoi;
+extern BatteryService Battery;
+extern BatteryPopupService BatteryPopup;
 
 #endif //BYTEBOI_H
