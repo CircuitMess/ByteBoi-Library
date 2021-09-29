@@ -155,17 +155,7 @@ void ByteBoiImpl::shutdown(){
 }
 
 void ByteBoiImpl::splash(Sprite& sprite, void* callback = nullptr){
-	Color* bgBuffer = nullptr;
 	Color* logoBuffer = nullptr;
-	bgBuffer = static_cast<Color*>(ps_malloc(160 * 120 * 2));
-	logoBuffer = static_cast<Color*>(ps_malloc(93 * 26 * 2));
-	fs::File bgFile = CompressedFile::open(SPIFFS.open("/launcher/mainMenuBg.raw.hs"), 13, 12);
-	if(!bgFile){
-		Serial.println("Error opening background in splash");
-		return;
-	}
-	bgFile.read(reinterpret_cast<uint8_t*>(bgBuffer), 160 * 120 * 2);
-	bgFile.close();
 	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
 	if(!logoFile){
 		Serial.println("Error opening logo in splash");
@@ -173,7 +163,7 @@ void ByteBoiImpl::splash(Sprite& sprite, void* callback = nullptr){
 	}
 	logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
 	logoFile.close();
-	sprite.drawIcon(bgBuffer, 0, 0, 160, 120, 1, TFT_BLACK);
+	sprite.clear(C_HEX(0x0082ff));
 	sprite.drawIcon(logoBuffer, (display->getWidth() / 2) - 46, (display->getHeight() / 2) - 13, 93, 26);
 	if(callback == nullptr){
 		delay(1000);
