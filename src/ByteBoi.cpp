@@ -69,7 +69,7 @@ void ByteBoiImpl::begin(){
 	bindMenu();
 
 	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(Settings.get().mute);
+	Piezo.setMute(Settings.get().volume);
 
 	Battery.begin();
 	LoopManager::addListener(&Sleep);
