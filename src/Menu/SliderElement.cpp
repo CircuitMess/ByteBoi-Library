@@ -1,26 +1,26 @@
 #include "SliderElement.h"
 
-SettingsScreen::SliderElement::SliderElement(ElementContainer* partent, String name) : SettingsElement(partent, name){
+SettingsMiniScreen::SliderElement::SliderElement(ElementContainer* partent, String name) : SettingsElement(partent, name){
 
 }
 
-void SettingsScreen::SliderElement::toggle(){
+void SettingsMiniScreen::SliderElement::toggle(){
 	sliderIsSelected = !sliderIsSelected;
 }
 
-void SettingsScreen::SliderElement::moveSliderValue(int8_t value){
+void SettingsMiniScreen::SliderElement::moveSliderValue(int8_t value){
 	sliderValue = constrain(sliderValue + 10*value, 0, 255);
 }
 
-void SettingsScreen::SliderElement::setSliderValue(uint8_t sliderValue){
+void SettingsMiniScreen::SliderElement::setSliderValue(uint8_t sliderValue){
 	SliderElement::sliderValue = sliderValue;
 }
 
-uint8_t SettingsScreen::SliderElement::getSliderValue() const{
+uint8_t SettingsMiniScreen::SliderElement::getSliderValue() const{
 	return sliderValue;
 }
 
-void SettingsScreen::SliderElement::drawControl(){
+void SettingsMiniScreen::SliderElement::drawControl(){
 	float movingCursor;
 	if(sliderValue == 0){
 		movingCursor = 0;
