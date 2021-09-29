@@ -62,7 +62,6 @@ void ByteBoiImpl::begin(){
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
 	LoopManager::addListener(Input::getInstance());
-	input->addListener(this);
 
 	Settings.begin();
 
@@ -74,8 +73,6 @@ void ByteBoiImpl::begin(){
 	Battery.begin();
 	LoopManager::addListener(&Sleep);
 	input->addListener(&Sleep);
-
-	ByteBoi.bindMenu();
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
@@ -130,14 +127,20 @@ void ByteBoiImpl::setGameID(String ID){
 
 void ByteBoiImpl::bindMenu(){
 	menuBind = true;
+	input->addListener(this);
 }
 
 void ByteBoiImpl::unbindMenu(){
 	menuBind = false;
+	input->removeListener(this);
 }
 
 void ByteBoiImpl::buttonPressed(uint i){
-	if(!menuBind) return;
+	if(!menuBind){
+		input->removeListener(this);
+		return;
+	}
+
 	if(i == BTN_C || (popupMenu != nullptr && i == BTN_B)){
 		if(ContextTransition::isRunning() || ModalTransition::isRunning()) return;
 
