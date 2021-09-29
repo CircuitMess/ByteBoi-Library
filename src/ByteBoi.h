@@ -15,7 +15,7 @@
 #include "Battery/BatteryService.h"
 #include "Battery/BatteryPopupService.h"
 
-class ByteBoiImpl : public InputListener {
+class ByteBoiImpl : public InputListener, public LoopListener{
 public:
 
 	/**
@@ -35,10 +35,13 @@ public:
 	void bindMenu();
 	void unbindMenu();
 
+	void splash(Sprite &sprite,void (* callback));
 	void shutdown();
 
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
+
+	void loop(uint micros) override;
 
 private:
 	Display* display;
