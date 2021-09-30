@@ -13,25 +13,16 @@ Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.inFirm
 	audioSwitch( new Switch(audioLayout)){
 	instance = this;
 
+	// TODO: rework this check, exit should appear if this is the game partition
 	if(!ByteBoi.inFirmware()){
 		exit = new TextElement(layout, 120, 20);
 	}
-	backgroundBuffer = static_cast<Color*>(ps_malloc(160 * 128 * 2));
-	if(backgroundBuffer == nullptr){
-		Serial.printf("MainMenu background picture unpack error\n");
-		return;
-	}
-
-	fs::File backgroundFile = CompressedFile::open(SPIFFS.open("/launcher/background.raw.hs"), 13, 12);
-
-	backgroundFile.read(reinterpret_cast<uint8_t*>(backgroundBuffer), 160 * 120 * 2);
-	backgroundFile.close();
 
 	buildUI();
 	audioSwitch->set(Settings.get().mute, true);
 }
 Menu::~Menu(){
-	free(backgroundBuffer);
+
 }
 
 void Menu::start(){
@@ -124,11 +115,8 @@ void Menu::selectElement(uint8_t index){
 
 void Menu::draw(){
 	canvas->clear(TFT_TRANSPARENT);
-	canvas->drawIcon(backgroundBuffer, 0, 0, 160, 120, 1);
-	canvas->fillTriangle(5, 0, 0, 5, 0, 0, TFT_TRANSPARENT);
-	canvas->fillTriangle(canvas->width(), 0, canvas->width(), 5, canvas->width() - 5, 0, TFT_TRANSPARENT);
-	canvas->fillTriangle(canvas->width(), canvas->height(), canvas->width(), canvas->height() - 5, canvas->width() - 5, canvas->height(), TFT_TRANSPARENT);
-	canvas->fillTriangle(5, canvas->height(), 0, canvas->height() - 5, 0, canvas->height(), TFT_TRANSPARENT);
+	canvas->fillRoundRect(screen.getTotalX(), screen.getTotalY(), canvas->width(), canvas->height(), 3, C_HEX(0x004194));
+	canvas->fillRoundRect(screen.getTotalX() + 2, screen.getTotalY() + 2, canvas->width() - 4, canvas->height() - 4, 3, C_HEX(0x0041ff));
 	screen.draw();
 
 }
