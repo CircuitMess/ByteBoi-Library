@@ -28,6 +28,8 @@ private:
 	bool shutdownDisable = false;
 	uint8_t level = 0;
 	Color* batteryBuffer[6] = {nullptr};
+	uint32_t timePassed = 0;
+	uint8_t pictureIndex = 0;
 };
 
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H
