@@ -4,7 +4,7 @@
 #include "SettingsElement.h"
 
 
-namespace SettingsMiniScreen {
+namespace MiniMenu {
 	class SliderElement : public SettingsElement {
 	public:
 		SliderElement(ElementContainer* partent, String name);

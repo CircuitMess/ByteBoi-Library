@@ -19,6 +19,7 @@
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
 using namespace std;
+using namespace MiniMenu;
 
 ByteBoiImpl ByteBoi;
 BatteryService Battery;

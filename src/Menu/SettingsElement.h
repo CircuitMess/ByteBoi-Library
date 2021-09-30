@@ -3,7 +3,7 @@
 
 #include <UI/CustomElement.h>
 
-namespace SettingsMiniScreen {
+namespace MiniMenu {
 	class SettingsElement : public CustomElement {
 	public:
 
