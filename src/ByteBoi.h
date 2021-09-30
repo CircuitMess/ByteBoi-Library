@@ -14,8 +14,7 @@
 #include <Input/InputListener.h>
 #include "Battery/BatteryService.h"
 #include "Battery/BatteryPopupService.h"
-
-class Menu;
+#include "Menu/Menu.h"
 
 class ByteBoiImpl : public InputListener {
 public:
@@ -51,7 +50,7 @@ private:
 	void buttonPressed(uint i) override;
 	volatile bool menuBind = false;
 
-	static Menu* popupMenu;
+	static MiniMenu::Menu* popupMenu;
 };
 
 extern ByteBoiImpl ByteBoi;
