@@ -14,6 +14,7 @@
 #include <Input/InputListener.h>
 #include "Battery/BatteryService.h"
 #include "Battery/BatteryPopupService.h"
+#include "Menu/Menu.h"
 
 class ByteBoiImpl : public InputListener, public LoopListener{
 public:
@@ -34,6 +35,7 @@ public:
 	void backToLauncher();
 	void bindMenu();
 	void unbindMenu();
+	void openMenu();
 
 	void splash(void (* callback)() = nullptr);
 	void shutdown();
@@ -49,7 +51,8 @@ private:
 	InputI2C* input;
 	String gameID = "";
 	void buttonPressed(uint i) override;
-	bool menuBind = false;
+	volatile bool menuBind = false;
+	static MiniMenu::Menu* popupMenu;
 
 	void (* splashCallback)() = nullptr;
 	uint32_t splashTime = 0;

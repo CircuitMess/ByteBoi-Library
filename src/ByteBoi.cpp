@@ -4,9 +4,6 @@
 #include <SPI.h>
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
-#include <PropertiesParser.h>
-#include <iostream>
-#include <utility>
 #include <Loop/LoopManager.h>
 #include "ByteBoiLED.h"
 #include "Menu/Menu.h"
@@ -14,8 +11,7 @@
 #include "Battery/BatteryPopupService.h"
 #include "SleepService.h"
 #include <Loop/LoopManager.h>
-#include <WiFi.h>
-#include <FS/CompressedFile.h>
+#include <esp_wifi.h>
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
@@ -25,6 +21,7 @@ using namespace MiniMenu;
 ByteBoiImpl ByteBoi;
 BatteryService Battery;
 BatteryPopupService BatteryPopup;
+Menu* ByteBoiImpl::popupMenu = nullptr;
 
 void ByteBoiImpl::begin(){
 
@@ -68,15 +65,12 @@ void ByteBoiImpl::begin(){
 
 	Context::setDeleteOnPop(true);
 
-	bindMenu();
-
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(Settings.get().volume);
 
 	Battery.begin();
 	LoopManager::addListener(&Sleep);
 	input->addListener(&Sleep);
-
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
@@ -131,17 +125,46 @@ void ByteBoiImpl::setGameID(String ID){
 
 void ByteBoiImpl::bindMenu(){
 	menuBind = true;
+	input->addListener(this);
 }
 
 void ByteBoiImpl::unbindMenu(){
 	menuBind = false;
+	input->removeListener(this);
 }
 
 void ByteBoiImpl::buttonPressed(uint i){
-	if(!menuBind) return;
-	if(i == BTN_C){
-		Menu* menu = new Menu(Context::getCurrentContext());
-		menu->push(Context::getCurrentContext());
+	if(!menuBind){
+		input->removeListener(this);
+		return;
+	}
+
+	if(i == BTN_C || (popupMenu != nullptr && i == BTN_B)){
+		if(ContextTransition::isRunning() || ModalTransition::isRunning()) return;
+
+		if(popupMenu == nullptr){
+			openMenu();
+		}else if(popupMenu != nullptr){
+			Menu::popIntoPrevious();
+			popupMenu = nullptr;
+		}
+	}
+}
+
+void ByteBoiImpl::openMenu(){
+	if(ContextTransition::isRunning() || ModalTransition::isRunning()) return;
+	if(Modal::getCurrentModal() != nullptr){
+		ModalTransition::setDeleteOnPop(false);
+		auto transition = static_cast<ModalTransition *>((void *)Modal::getCurrentModal()->pop());
+		transition->setDoneCallback([](Context *currentContext, Modal *prevModal){
+			ByteBoiImpl::popupMenu = new Menu(currentContext);
+			ByteBoiImpl::popupMenu->push(currentContext);
+			ByteBoiImpl::popupMenu->returned(prevModal);
+			ModalTransition::setDeleteOnPop(true);
+		});
+	}else{
+		ByteBoiImpl::popupMenu = new Menu(Context::getCurrentContext());
+		ByteBoiImpl::popupMenu->push(Context::getCurrentContext());
 	}
 }
 
@@ -149,7 +172,7 @@ void ByteBoiImpl::shutdown(){
 	display->getTft()->sleep();
 	expander->pinMode(BL_PIN, 1);
 	LED.setRGB(OFF);
-	WiFi.mode(WIFI_OFF);
+	esp_wifi_stop();
 	btStop();
 	Piezo.noTone();
 	esp_deep_sleep_start();

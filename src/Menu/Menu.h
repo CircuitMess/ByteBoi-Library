@@ -21,18 +21,20 @@ namespace MiniMenu {
 		void start() override;
 		void stop() override;
 
+		void returned(void* data) override;
+		static void popIntoPrevious();
+
 	private:
 		static Menu* instance;
 
 		Sprite* canvas;
 		Context* currentContext = nullptr;
-		Color* backgroundBuffer = nullptr;
 
-		LinearLayout layout;
-		TextElement exit;
-		LinearLayout audioLayout;
-		TextElement muteText;
-		Switch audioSwitch;
+		LinearLayout *layout;
+		TextElement *exit;
+		LinearLayout *audioLayout;
+		TextElement *muteText;
+		Switch *audioSwitch;
 
 		float showProgress = 0;
 		bool shown = false;
@@ -49,6 +51,8 @@ namespace MiniMenu {
 		void buildUI();
 		void bindInput();
 		void releaseInput();
+
+		Modal* prevModal = nullptr;
 	};
 };
 
