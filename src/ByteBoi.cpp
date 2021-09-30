@@ -19,6 +19,7 @@
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
 using namespace std;
+using namespace MiniMenu;
 
 ByteBoiImpl ByteBoi;
 BatteryService Battery;
@@ -69,7 +70,7 @@ void ByteBoiImpl::begin(){
 	bindMenu();
 
 	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(Settings.get().mute);
+	Piezo.setMute(Settings.get().volume);
 
 	Battery.begin();
 	LoopManager::addListener(&Sleep);
