@@ -183,7 +183,13 @@ void ByteBoiImpl::splash(void(* callback)()){
 	logoBuffer = static_cast<Color*>(ps_malloc(93*26*2));
 	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
 	if(!logoFile){
-		Serial.println("Error opening logo in splash");
+		Serial.println("Error opening splash logo");
+		free(logoBuffer);
+		if(callback != nullptr){
+			splashCallback = nullptr;
+			splashTime = 0;
+			callback();
+		}
 		return;
 	}
 	logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
