@@ -156,6 +156,7 @@ void ByteBoiImpl::shutdown(){
 
 void ByteBoiImpl::splash(void(* callback)()){
 	Color* logoBuffer = nullptr;
+	logoBuffer = static_cast<Color*>(ps_malloc(93*26*2));
 	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
 	if(!logoFile){
 		Serial.println("Error opening logo in splash");
