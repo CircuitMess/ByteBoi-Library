@@ -50,6 +50,9 @@ private:
 	String gameID = "";
 	void buttonPressed(uint i) override;
 	bool menuBind = false;
+
+	void (* splashCallback)() = nullptr;
+	uint32_t splashTime = 0;
 };
 
 extern ByteBoiImpl ByteBoi;

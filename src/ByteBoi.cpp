@@ -169,15 +169,29 @@ void ByteBoiImpl::splash(void(* callback)()){
 	if(callback == nullptr){
 		delay(1000);
 	}else{
+		splashCallback = callback;
 		LoopManager::addListener(this);
+		splashTime = millis();
 	}
 
 
 }
 
 void ByteBoiImpl::loop(uint micros){
-	if(millis() > 1000){
+	if(splashTime == 0 || splashCallback == nullptr){
+		splashTime = 0;
+		splashCallback = nullptr;
 		LoopManager::removeListener(this);
+		return;
+	}
+	if(millis() - splashTime >= 1000){
+		LoopManager::removeListener(this);
+		if(splashCallback != nullptr){
+			void(*callback)() = splashCallback;
+			splashCallback = nullptr;
+			splashTime = 0;
+			callback();
+		}
 	}
 }
 
