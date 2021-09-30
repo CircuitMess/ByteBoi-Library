@@ -154,7 +154,7 @@ void ByteBoiImpl::shutdown(){
 	esp_deep_sleep_start();
 }
 
-void ByteBoiImpl::splash(Sprite& sprite, void* callback = nullptr){
+void ByteBoiImpl::splash(void(* callback)()){
 	Color* logoBuffer = nullptr;
 	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
 	if(!logoFile){
@@ -163,8 +163,9 @@ void ByteBoiImpl::splash(Sprite& sprite, void* callback = nullptr){
 	}
 	logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
 	logoFile.close();
-	sprite.clear(C_HEX(0x0041ff));
-	sprite.drawIcon(logoBuffer, (display->getWidth() / 2) - 46, (display->getHeight() / 2) - 13, 93, 26);
+	display->getBaseSprite()->clear(C_HEX(0x0041ff));
+	display->getBaseSprite()->drawIcon(logoBuffer, (display->getWidth() / 2) - 46, (display->getHeight() / 2) - 13, 93, 26);
+	display->commit();
 	if(callback == nullptr){
 		delay(1000);
 	}else{

@@ -35,7 +35,7 @@ public:
 	void bindMenu();
 	void unbindMenu();
 
-	void splash(Sprite &sprite,void (* callback));
+	void splash(void (* callback)() = nullptr);
 	void shutdown();
 
 	static const char* SPIFFSgameRoot;
