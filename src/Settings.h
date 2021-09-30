@@ -6,7 +6,6 @@
 struct SettingsData {
 	uint32_t shutdownTime = 0;
 	uint8_t volume = 20;
-	bool mute = false;
 	bool RGBenable = true;
 };
 

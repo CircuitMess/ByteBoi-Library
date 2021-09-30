@@ -1,7 +1,7 @@
 #include <Loop/LoopManager.h>
 #include "Switch.h"
 
-Switch::Switch(ElementContainer* parent) : CustomElement(parent, 60, 20){
+MiniMenu::Switch::Switch(ElementContainer* parent) : CustomElement(parent, 60, 20){
 
 }
 
@@ -10,7 +10,7 @@ float easeOutElastic(float x, float toggleAcum){
 	return x == 0 ? 0 : x == 1 ? 1 : pow(2, -10.0f * x / (max(0.1f, toggleAcum) * 10.0f)) * sin((x * 10.0f - 0.75f) * c4) * (0.5f + toggleAcum) + 1.0f;
 }
 
-void Switch::draw(){
+void MiniMenu::Switch::draw(){
 	Sprite* canvas = getSprite();
 
 	float t = state ? easeOutElastic(toggleProgress, toggleAccum) : (1.0f - easeOutElastic(1.0f - toggleProgress, toggleAccum));
@@ -42,7 +42,7 @@ void Switch::draw(){
 	Element::draw();
 }
 
-void Switch::loop(uint micros){
+void MiniMenu::Switch::loop(uint micros){
 	if(state){
 		toggleProgress = min(1.0f, toggleProgress + (float) micros / 1000000.0f);
 	}else{
@@ -59,7 +59,7 @@ void Switch::loop(uint micros){
 	}
 }
 
-void Switch::toggle(){
+void MiniMenu::Switch::toggle(){
 	//if(toggling) return;
 
 	state = !state;
@@ -73,7 +73,7 @@ void Switch::toggle(){
 	}
 }
 
-void Switch::set(bool state, bool instant){
+void MiniMenu::Switch::set(bool state, bool instant){
 	if(this->state == state) return;
 
 	this->state = state;
@@ -93,6 +93,6 @@ void Switch::set(bool state, bool instant){
 	}
 }
 
-bool Switch::getState(){
+bool MiniMenu::Switch::getState(){
 	return state;
 }
