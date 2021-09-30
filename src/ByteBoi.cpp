@@ -193,7 +193,7 @@ void ByteBoiImpl::splash(void(* callback)()){
 	free(logoBuffer);
 	display->commit();
 	if(callback == nullptr){
-		delay(1000);
+		delay(2000);
 	}else{
 		splashCallback = callback;
 		LoopManager::addListener(this);
@@ -210,7 +210,7 @@ void ByteBoiImpl::loop(uint micros){
 		LoopManager::removeListener(this);
 		return;
 	}
-	if(millis() - splashTime >= 1000){
+	if(millis() - splashTime >= 2000){
 		LoopManager::removeListener(this);
 		if(splashCallback != nullptr){
 			void(*callback)() = splashCallback;
