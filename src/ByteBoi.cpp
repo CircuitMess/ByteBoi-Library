@@ -178,3 +178,53 @@ void ByteBoiImpl::shutdown(){
 	esp_deep_sleep_start();
 }
 
+void ByteBoiImpl::splash(void(* callback)()){
+	Color* logoBuffer = nullptr;
+	logoBuffer = static_cast<Color*>(ps_malloc(93*26*2));
+	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
+	if(!logoFile){
+		Serial.println("Error opening splash logo");
+		free(logoBuffer);
+		if(callback != nullptr){
+			splashCallback = nullptr;
+			splashTime = 0;
+			callback();
+		}
+		return;
+	}
+	logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
+	logoFile.close();
+	display->getBaseSprite()->clear(C_HEX(0x0041ff));
+	display->getBaseSprite()->drawIcon(logoBuffer, (display->getWidth() / 2) - 46, (display->getHeight() / 2) - 13, 93, 26);
+	free(logoBuffer);
+	display->commit();
+	if(callback == nullptr){
+		delay(2000);
+	}else{
+		splashCallback = callback;
+		LoopManager::addListener(this);
+		splashTime = millis();
+	}
+
+
+}
+
+void ByteBoiImpl::loop(uint micros){
+	if(splashTime == 0 || splashCallback == nullptr){
+		splashTime = 0;
+		splashCallback = nullptr;
+		LoopManager::removeListener(this);
+		return;
+	}
+	if(millis() - splashTime >= 2000){
+		LoopManager::removeListener(this);
+		if(splashCallback != nullptr){
+			void(*callback)() = splashCallback;
+			splashCallback = nullptr;
+			splashTime = 0;
+			callback();
+		}
+	}
+}
+
+

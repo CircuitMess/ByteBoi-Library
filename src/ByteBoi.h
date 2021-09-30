@@ -16,7 +16,7 @@
 #include "Battery/BatteryPopupService.h"
 #include "Menu/Menu.h"
 
-class ByteBoiImpl : public InputListener {
+class ByteBoiImpl : public InputListener, public LoopListener{
 public:
 
 	/**
@@ -37,10 +37,13 @@ public:
 	void unbindMenu();
 	void openMenu();
 
+	void splash(void (* callback)() = nullptr);
 	void shutdown();
 
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;
+
+	void loop(uint micros) override;
 
 private:
 	Display* display;
@@ -49,8 +52,10 @@ private:
 	String gameID = "";
 	void buttonPressed(uint i) override;
 	volatile bool menuBind = false;
-
 	static MiniMenu::Menu* popupMenu;
+
+	void (* splashCallback)() = nullptr;
+	uint32_t splashTime = 0;
 };
 
 extern ByteBoiImpl ByteBoi;
