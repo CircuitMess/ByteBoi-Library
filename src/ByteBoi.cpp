@@ -167,6 +167,7 @@ void ByteBoiImpl::splash(void(* callback)()){
 	logoFile.close();
 	display->getBaseSprite()->clear(C_HEX(0x0041ff));
 	display->getBaseSprite()->drawIcon(logoBuffer, (display->getWidth() / 2) - 46, (display->getHeight() / 2) - 13, 93, 26);
+	free(logoBuffer);
 	display->commit();
 	if(callback == nullptr){
 		delay(1000);
