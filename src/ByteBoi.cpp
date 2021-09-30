@@ -4,9 +4,6 @@
 #include <SPI.h>
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
-#include <PropertiesParser.h>
-#include <iostream>
-#include <utility>
 #include <Loop/LoopManager.h>
 #include "ByteBoiLED.h"
 #include "Menu/Menu.h"
@@ -14,11 +11,12 @@
 #include "Battery/BatteryPopupService.h"
 #include "SleepService.h"
 #include <Loop/LoopManager.h>
-#include <WiFi.h>
+#include <esp_wifi.h>
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
 using namespace std;
+using namespace MiniMenu;
 
 ByteBoiImpl ByteBoi;
 BatteryService Battery;
@@ -68,7 +66,7 @@ void ByteBoiImpl::begin(){
 	Context::setDeleteOnPop(true);
 
 	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(Settings.get().mute);
+	Piezo.setMute(Settings.get().volume);
 
 	Battery.begin();
 	LoopManager::addListener(&Sleep);
@@ -174,7 +172,7 @@ void ByteBoiImpl::shutdown(){
 	display->getTft()->sleep();
 	expander->pinMode(BL_PIN, 1);
 	LED.setRGB(OFF);
-	WiFi.mode(WIFI_OFF);
+	esp_wifi_stop();
 	btStop();
 	Piezo.noTone();
 	esp_deep_sleep_start();

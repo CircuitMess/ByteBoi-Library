@@ -10,49 +10,50 @@
 #include <Support/Modal.h>
 class Sprite;
 
-class Menu : public LoopListener, public Modal {
-public:
-	Menu(Context* currentContext);
-	virtual ~Menu();
-	void loop(uint micros) override;
-	void draw() override;
+namespace MiniMenu {
+	class Menu : public LoopListener, public Modal {
+	public:
+		Menu(Context* currentContext);
+		virtual ~Menu();
+		void loop(uint micros) override;
+		void draw() override;
 
-	void start() override;
-	void stop() override;
+		void start() override;
+		void stop() override;
 
-	void returned(void* data) override;
-	static void popIntoPrevious();
+		void returned(void* data) override;
+		static void popIntoPrevious();
 
-private:
-	static Menu* instance;
+	private:
+		static Menu* instance;
 
-	Sprite* canvas;
-	Context* currentContext = nullptr;
+		Sprite* canvas;
+		Context* currentContext = nullptr;
 
-	LinearLayout *layout;
-	TextElement *exit;
-	LinearLayout *audioLayout;
-	TextElement *muteText;
-	Switch *audioSwitch;
+		LinearLayout *layout;
+		TextElement *exit;
+		LinearLayout *audioLayout;
+		TextElement *muteText;
+		Switch *audioSwitch;
 
-	float showProgress = 0;
-	bool shown = false;
-	bool shownDone = false;
+		float showProgress = 0;
+		bool shown = false;
+		bool shownDone = false;
 
-	bool exiting = false;
-	bool stopping = false;
+		bool exiting = false;
+		bool stopping = false;
 
-	float selectAccum = 0;
-	uint8_t selectedX;
-	uint8_t selectedElement = 0;
-	void selectElement(uint8_t index);
+		float selectAccum = 0;
+		uint8_t selectedX;
+		uint8_t selectedElement = 0;
+		void selectElement(uint8_t index);
 
-	void buildUI();
-	void bindInput();
-	void releaseInput();
+		void buildUI();
+		void bindInput();
+		void releaseInput();
 
-	Modal* prevModal = nullptr;
+		Modal* prevModal = nullptr;
+	};
 };
-
 
 #endif //BYTEBOI_LIBRARY_MENU_H

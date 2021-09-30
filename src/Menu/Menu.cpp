@@ -5,9 +5,9 @@
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
 
-Menu* Menu::instance = nullptr;
+MiniMenu::Menu* MiniMenu::Menu::instance = nullptr;
 
-Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.inFirmware() ? 38 : 57), canvas(screen.getSprite()),
+MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.inFirmware() ? 38 : 57), canvas(screen.getSprite()),
 	layout(new LinearLayout(&screen, VERTICAL)), audioLayout( new LinearLayout(layout, HORIZONTAL)),
 	muteText(new TextElement(audioLayout, 50, 20)),
 	audioSwitch( new Switch(audioLayout)){
@@ -19,34 +19,40 @@ Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.inFirm
 	}
 
 	buildUI();
-	audioSwitch->set(Settings.get().mute, true);
+	audioSwitch->set(Settings.get().volume, true);
 }
-Menu::~Menu(){
+
+MiniMenu::Menu::~Menu(){
 
 }
 
-void Menu::start(){
+void MiniMenu::Menu::start(){
 	selectElement(0);
 	bindInput();
-	audioSwitch->set(Settings.get().mute, true);
+	audioSwitch->set(Settings.get().volume, true);
 	LoopManager::addListener(this);
 }
 
-void Menu::stop(){
+void MiniMenu::Menu::stop(){
+	Settings.store();
 	releaseInput();
 	LoopManager::removeListener(this);
-	Settings.store();
 
 }
 
-void Menu::bindInput(){
+void MiniMenu::Menu::bindInput(){
+
+	Input::getInstance()->setBtnPressCallback(BTN_B, [](){
+		if(instance == nullptr) return;
+		instance->pop();
+	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->audioSwitch->toggle();
-			Settings.get().mute = instance->audioSwitch->getState();
-			Piezo.setMute(!Settings.get().mute);
+			Settings.get().volume = instance->audioSwitch->getState();
+			Piezo.setMute(!Settings.get().volume);
 			Piezo.tone(500, 50);
 		}else{
 			instance->pop();
@@ -68,8 +74,8 @@ void Menu::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
-			Settings.get().mute = true;
-			Piezo.setMute(!Settings.get().mute);
+			Settings.get().volume = 1;
+			Piezo.setMute(!Settings.get().volume);
 			if(instance->audioSwitch->getState() == false)
 			{
 				Piezo.tone(500, 50);
@@ -82,22 +88,23 @@ void Menu::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->audioSwitch->set(false);
-			Settings.get().mute = 0;
-			Piezo.setMute(!Settings.get().mute);
+			Settings.get().volume = 0;
+			Piezo.setMute(!Settings.get().volume);
 			Piezo.tone(500, 50);
 		}
 	});
 }
 
-void Menu::releaseInput(){
+void MiniMenu::Menu::releaseInput(){
 	Input::getInstance()->removeBtnPressCallback(BTN_UP);
 	Input::getInstance()->removeBtnPressCallback(BTN_DOWN);
 	Input::getInstance()->removeBtnPressCallback(BTN_LEFT);
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
+	Input::getInstance()->removeBtnPressCallback(BTN_B);
 }
 
-void Menu::selectElement(uint8_t index){
+void MiniMenu::Menu::selectElement(uint8_t index){
 	layout->reposChildren();
 	audioLayout->reposChildren();
 	selectedElement = index;
@@ -113,7 +120,7 @@ void Menu::selectElement(uint8_t index){
 	selectedText->setColor(TFT_YELLOW);
 }
 
-void Menu::draw(){
+void MiniMenu::Menu::draw(){
 	canvas->clear(TFT_TRANSPARENT);
 	canvas->fillRoundRect(screen.getTotalX(), screen.getTotalY(), canvas->width(), canvas->height(), 3, C_HEX(0x004194));
 	canvas->fillRoundRect(screen.getTotalX() + 2, screen.getTotalY() + 2, canvas->width() - 4, canvas->height() - 4, 3, C_HEX(0x0041ff));
@@ -121,7 +128,7 @@ void Menu::draw(){
 
 }
 
-void Menu::loop(uint micros){
+void MiniMenu::Menu::loop(uint micros){
 
 	selectAccum += (float) micros / 1000000.0f;
 	TextElement* selectedText = muteText;
@@ -134,7 +141,7 @@ void Menu::loop(uint micros){
 	screen.commit();
 }
 
-void Menu::buildUI(){
+void MiniMenu::Menu::buildUI(){
 	layout->setWHType(CHILDREN, CHILDREN);
 	layout->setPadding(5);
 	layout->setGutter(5);
@@ -168,11 +175,11 @@ void Menu::buildUI(){
 
 }
 
-void Menu::returned(void* data){
+void MiniMenu::Menu::returned(void* data){
 	prevModal = (Modal*)data;
 }
 
-void Menu::popIntoPrevious(){
+void MiniMenu::Menu::popIntoPrevious(){
 	ModalTransition* transition = static_cast<ModalTransition*>((void*)instance->pop());
 	if(instance->prevModal == nullptr) return;
 	transition->setDoneCallback([](Context* currContext, Modal*){

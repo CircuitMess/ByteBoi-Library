@@ -59,14 +59,10 @@ void BatteryService::begin(){
 	pinMode(BATTERY_PIN, INPUT);
 
 	char filename[50];
-	for(uint8_t i = 0; i < 6; i++){
-		batteryBuffer[i] = static_cast<Color*>(ps_malloc((i == 5 ? 6*6*2 : 14 * 6 * 2)));
+	for(uint8_t i = 0; i < 5; i++){
+		batteryBuffer[i] = static_cast<Color*>(ps_malloc(14 * 6 * 2));
+		sprintf(filename, "/launcher/battery_%d.raw", i);
 
-		if(i == 5){
-			sprintf(filename, "/launcher/chargingIcon.raw");
-		}else{
-			sprintf(filename, "/launcher/battery_%d.raw", i);
-		}
 		fs::File file = SPIFFS.open(filename);
 		if(!file){
 			printf("Failed opening battery icon: %s\n", filename);
@@ -75,7 +71,7 @@ void BatteryService::begin(){
 			file.close();
 			continue;
 		}
-		file.read(reinterpret_cast<uint8_t*>(batteryBuffer[i]), (i == 5 ? 6 * 6 * 2 : 14 * 6 * 2));
+		file.read(reinterpret_cast<uint8_t*>(batteryBuffer[i]), 14 * 6 * 2);
 		file.close();
 	}
 }
@@ -85,7 +81,25 @@ bool BatteryService::isCharging() const{
 }
 
 void BatteryService::drawIcon(Sprite &sprite, int16_t x, int16_t y){
-	Color* buffer = batteryBuffer[(isCharging() ? 5 : getLevel())];
+	Color* buffer = batteryBuffer[getLevel()];
 	if(buffer == nullptr) return;
-	sprite.drawIcon(buffer, x, y, (isCharging() ? 6 : 14), 6, 1, TFT_TRANSPARENT);
+	if(!isCharging() && timePassed != 0){
+		timePassed = 0;
+	}
+	if(isCharging()){
+		if(timePassed == 0){
+			timePassed = millis();
+			pictureIndex = 0;
+		}
+		if(millis() - timePassed >= 300){
+			timePassed = millis();
+			pictureIndex++;
+			if(pictureIndex > 4){
+				pictureIndex = 0;
+			}
+		}
+		sprite.drawIcon(batteryBuffer[pictureIndex], x, y, 14, 6, 1, TFT_TRANSPARENT);
+	}else{
+		sprite.drawIcon(buffer, x, y, 14, 6, 1, TFT_TRANSPARENT);
+	}
 }
