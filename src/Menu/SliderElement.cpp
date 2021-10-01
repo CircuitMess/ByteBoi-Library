@@ -23,10 +23,10 @@ void MiniMenu::SliderElement::draw(){
 	}else{
 		movingCursor = ((float) sliderValue / 255) * 41.0f;
 	}
-	getSprite()->drawRect(getTotalX() + 10, getTotalY() + 34, 2, 5, TFT_WHITE);
-	getSprite()->drawRect(getTotalX() + 53, getTotalY() + 34, 2, 5, TFT_WHITE);
-	getSprite()->drawRect(getTotalX() + 10, getTotalY() + 36, 43, 1, TFT_WHITE);
-		getSprite()->fillRoundRect(getTotalX() + 10 + movingCursor, getTotalY() + 33, 4, 7, 1, TFT_WHITE);
+	getSprite()->drawRect(getTotalX() + 10, getTotalY() + 9, 2, 5, TFT_WHITE);
+	getSprite()->drawRect(getTotalX() + 53, getTotalY() + 9, 2, 5, TFT_WHITE);
+	getSprite()->drawRect(getTotalX() + 10, getTotalY() + 11, 43, 1, TFT_WHITE);
+	getSprite()->fillRoundRect(getTotalX() + 10 + movingCursor, getTotalY() + 8, 4, 7, 1, TFT_WHITE);
 
 }
 

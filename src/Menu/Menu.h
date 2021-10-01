@@ -35,10 +35,12 @@ namespace MiniMenu {
 		TextElement *exit;
 		LinearLayout *RGBEnableLayout;
 		LinearLayout *volumeLayout;
-		TextElement *muteText;
+		TextElement *ledText;
 		TextElement *volumeText;
 		Switch *LEDSwitch;
 		SliderElement* volumeSlider;
+
+		TextElement* texts[3];
 
 		float showProgress = 0;
 		bool shown = false;
