@@ -27,6 +27,7 @@ public:
 	I2cExpander* getExpander();
 	InputI2C* getInput();
 	static bool inFirmware();
+	static bool isStandalone();
 
 	//functions to be used by games
 	File openResource(const String& path, const char* mode);

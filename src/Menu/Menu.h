@@ -32,7 +32,7 @@ namespace MiniMenu {
 		Context* currentContext = nullptr;
 
 		LinearLayout *layout;
-		TextElement *exit;
+		TextElement *exit = nullptr;
 		LinearLayout *RGBEnableLayout;
 		LinearLayout *volumeLayout;
 		TextElement *ledText;

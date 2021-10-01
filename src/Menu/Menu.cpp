@@ -7,7 +7,7 @@
 
 MiniMenu::Menu* MiniMenu::Menu::instance = nullptr;
 
-MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.inFirmware() ? 61 : 80), canvas(screen.getSprite()),
+MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.isStandalone() ? 56 : 72), canvas(screen.getSprite()),
 												layout(new LinearLayout(&screen, VERTICAL)), RGBEnableLayout(new LinearLayout(layout, HORIZONTAL)),
 												volumeLayout(new LinearLayout(layout, HORIZONTAL)),
 												ledText(new TextElement(RGBEnableLayout, 50, 20)),
@@ -17,7 +17,7 @@ MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, Byte
 	instance = this;
 
 	// TODO: rework this check, exit should appear if this is the game partition
-	if(!ByteBoi.inFirmware()){
+	if(!ByteBoi.isStandalone()){
 		exit = new TextElement(layout, 120, 20);
 	}
 
@@ -74,19 +74,18 @@ void MiniMenu::Menu::bindInput(){
 		if(instance == nullptr) return;
 		instance->selectedElement--;
 		if(instance->selectedElement < 0){
-			instance->selectedElement = 2;
+			instance->selectedElement = instance->layout->getChildren().size() - 1;
 		}
 		instance->selectElement(instance->selectedElement);
-
 		Piezo.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_DOWN, [](){
 		if(instance == nullptr) return;
 		instance->selectedElement++;
-		if(instance->selectedElement > 2){
-		instance->selectedElement = 0;
-	}
+		if(instance->selectedElement >= instance->layout->getChildren().size()){
+			instance->selectedElement = 0;
+		}
 		instance->selectElement(instance->selectedElement);
 		Piezo.tone(500, 50);
 	});
@@ -133,9 +132,12 @@ void MiniMenu::Menu::selectElement(uint8_t index){
 	selectedElement = index;
 	selectAccum = 0;
 
-	exit->setColor(TFT_WHITE);
 	ledText->setColor(TFT_WHITE);
 	volumeText->setColor(TFT_WHITE);
+
+	if(exit){
+		exit->setColor(TFT_WHITE);
+	}
 
 	texts[index]->setColor(TFT_YELLOW);
 	selectedX = texts[index]->getX();
@@ -177,7 +179,7 @@ void MiniMenu::Menu::buildUI(){
 
 	layout->addChild(volumeLayout);
 	layout->addChild(RGBEnableLayout);
-	if(!ByteBoi.inFirmware()){
+	if(exit){
 		layout->addChild(exit);
 		exit->setFont(1);
 		exit->setSize(1);

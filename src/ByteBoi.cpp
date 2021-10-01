@@ -98,6 +98,10 @@ bool ByteBoiImpl::inFirmware(){
 	return (strcmp(esp_ota_get_running_partition()->label, "launcher") == 0); //already in launcher partition
 }
 
+bool ByteBoiImpl::isStandalone(){
+	return (strcmp(esp_ota_get_running_partition()->label, "game") != 0); //already in launcher partition
+}
+
 void ByteBoiImpl::backToLauncher(){
 	if(inFirmware()) return;
 
