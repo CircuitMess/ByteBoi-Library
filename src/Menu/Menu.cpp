@@ -164,7 +164,9 @@ void MiniMenu::Menu::draw(){
 	canvas->clear(TFT_TRANSPARENT);
 	canvas->fillRoundRect(screen.getTotalX(), screen.getTotalY(), canvas->width(), canvas->height(), 3, C_HEX(0x004194));
 	canvas->fillRoundRect(screen.getTotalX() + 2, screen.getTotalY() + 2, canvas->width() - 4, canvas->height() - 4, 3, C_HEX(0x0041ff));
-	screen.draw();
+	RGBEnableLayout->getChild(0)->draw();
+    Battery.drawIcon(*canvas,110,70);
+    screen.draw();
 
 }
 
