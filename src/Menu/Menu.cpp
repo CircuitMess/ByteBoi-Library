@@ -173,7 +173,6 @@ void MiniMenu::Menu::buildUI(){
 	volumeLayout->setWHType(PARENT,CHILDREN);
 	volumeLayout->addChild(volumeText);
 	volumeLayout->addChild(volumeSlider);
-	volumeLayout->setGutter(1);
 	volumeLayout->reflow();
 
 	layout->addChild(volumeLayout);
