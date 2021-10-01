@@ -7,6 +7,7 @@
 #include <UI/TextElement.h>
 #include <Loop/LoopListener.h>
 #include "Switch.h"
+#include "SliderElement.h"
 #include <Support/Modal.h>
 class Sprite;
 
@@ -32,9 +33,12 @@ namespace MiniMenu {
 
 		LinearLayout *layout;
 		TextElement *exit;
-		LinearLayout *audioLayout;
+		LinearLayout *RGBEnableLayout;
+		LinearLayout *volumeLayout;
 		TextElement *muteText;
-		Switch *audioSwitch;
+		TextElement *volumeText;
+		Switch *LEDSwitch;
+		SliderElement* volumeSlider;
 
 		float showProgress = 0;
 		bool shown = false;
@@ -45,7 +49,7 @@ namespace MiniMenu {
 
 		float selectAccum = 0;
 		uint8_t selectedX;
-		uint8_t selectedElement = 0;
+		int8_t selectedElement = 0;
 		void selectElement(uint8_t index);
 
 		void buildUI();
