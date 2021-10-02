@@ -7,19 +7,27 @@
 
 MiniMenu::Menu* MiniMenu::Menu::instance = nullptr;
 
-MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.inFirmware() ? 38 : 57), canvas(screen.getSprite()),
-	layout(new LinearLayout(&screen, VERTICAL)), audioLayout( new LinearLayout(layout, HORIZONTAL)),
-	muteText(new TextElement(audioLayout, 50, 20)),
-	audioSwitch( new Switch(audioLayout)){
+MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, ByteBoi.isStandalone() ? 56 : 72), canvas(screen.getSprite()),
+												layout(new LinearLayout(&screen, VERTICAL)), RGBEnableLayout(new LinearLayout(layout, HORIZONTAL)),
+												volumeLayout(new LinearLayout(layout, HORIZONTAL)),
+												ledText(new TextElement(RGBEnableLayout, 50, 20)),
+												volumeText(new TextElement(volumeLayout, 50, 20)),
+												LEDSwitch(new Switch(RGBEnableLayout)),
+												volumeSlider(new SliderElement(volumeLayout)){
 	instance = this;
 
 	// TODO: rework this check, exit should appear if this is the game partition
-	if(!ByteBoi.inFirmware()){
+	if(!ByteBoi.isStandalone()){
 		exit = new TextElement(layout, 120, 20);
 	}
 
 	buildUI();
-	audioSwitch->set(Settings.get().volume, true);
+	LEDSwitch->set(Settings.get().RGBenable, true);
+	volumeSlider->setSliderValue(Settings.get().volume);
+
+	texts[0] = volumeText;
+	texts[1] = ledText;
+	texts[2] = exit;
 }
 
 MiniMenu::Menu::~Menu(){
@@ -29,11 +37,14 @@ MiniMenu::Menu::~Menu(){
 void MiniMenu::Menu::start(){
 	selectElement(0);
 	bindInput();
-	audioSwitch->set(Settings.get().volume, true);
+	LEDSwitch->set(Settings.get().RGBenable, true);
+	volumeSlider->setSliderValue(Settings.get().volume);
 	LoopManager::addListener(this);
 }
 
 void MiniMenu::Menu::stop(){
+	Settings.get().volume = instance->volumeSlider->getSliderValue();
+	Settings.get().RGBenable = instance->LEDSwitch->getState();
 	Settings.store();
 	releaseInput();
 	LoopManager::removeListener(this);
@@ -49,49 +60,58 @@ void MiniMenu::Menu::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
-		if(instance->selectedElement == 0){
-			instance->audioSwitch->toggle();
-			Settings.get().volume = instance->audioSwitch->getState();
-			Piezo.setMute(!Settings.get().volume);
-			Piezo.tone(500, 50);
-		}else{
-			instance->pop();
+		Piezo.tone(500, 50);
+		if(instance->selectedElement == 1){
+			instance->LEDSwitch->toggle();
+			Settings.get().RGBenable = instance->LEDSwitch->getState();
+		}else if(instance->selectedElement == 2){
+			instance->stop();
+			ByteBoi.backToLauncher();
 		}
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){
 		if(instance == nullptr) return;
-		instance->selectElement(instance->selectedElement == 0 ? 1 : 0);
+		instance->selectedElement--;
+		if(instance->selectedElement < 0){
+			instance->selectedElement = instance->layout->getChildren().size() - 1;
+		}
+		instance->selectElement(instance->selectedElement);
 		Piezo.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_DOWN, [](){
 		if(instance == nullptr) return;
-		instance->selectElement((instance->selectedElement + 1) % 2);
+		instance->selectedElement++;
+		if(instance->selectedElement >= instance->layout->getChildren().size()){
+			instance->selectedElement = 0;
+		}
+		instance->selectElement(instance->selectedElement);
 		Piezo.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
-			Settings.get().volume = 1;
-			Piezo.setMute(!Settings.get().volume);
-			if(instance->audioSwitch->getState() == false)
-			{
-				Piezo.tone(500, 50);
-			}
-			instance->audioSwitch->set(true);
+			instance->volumeSlider->moveSliderValue(1);
+		}else if(instance->selectedElement == 1){
+			instance->LEDSwitch->toggle();
+			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
-			instance->audioSwitch->set(false);
-			Settings.get().volume = 0;
-			Piezo.setMute(!Settings.get().volume);
-			Piezo.tone(500, 50);
+			instance->volumeSlider->moveSliderValue(-1);
+		}else if(instance->selectedElement == 1){
+			instance->LEDSwitch->toggle();
+			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}
+	});
+	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
+		if(instance == nullptr) return;
+		instance->pop();
 	});
 }
 
@@ -102,59 +122,64 @@ void MiniMenu::Menu::releaseInput(){
 	Input::getInstance()->removeBtnPressCallback(BTN_RIGHT);
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
 	Input::getInstance()->removeBtnPressCallback(BTN_B);
+	Input::getInstance()->removeBtnPressCallback(BTN_C);
 }
 
 void MiniMenu::Menu::selectElement(uint8_t index){
 	layout->reposChildren();
-	audioLayout->reposChildren();
+	RGBEnableLayout->reposChildren();
+	volumeLayout->reposChildren();
 	selectedElement = index;
 	selectAccum = 0;
-	TextElement* selectedText = selectedElement == 0 ? muteText : exit;
-	selectedX = selectedText->getX();
 
-	if(ByteBoi.inFirmware()) return;
+	ledText->setColor(TFT_WHITE);
+	volumeText->setColor(TFT_WHITE);
 
-	exit->setColor(TFT_WHITE);
-	muteText->setColor(TFT_WHITE);
+	if(exit){
+		exit->setColor(TFT_WHITE);
+	}
 
-	selectedText->setColor(TFT_YELLOW);
+	texts[index]->setColor(TFT_YELLOW);
+	selectedX = texts[index]->getX();
 }
 
 void MiniMenu::Menu::draw(){
 	canvas->clear(TFT_TRANSPARENT);
 	canvas->fillRoundRect(screen.getTotalX(), screen.getTotalY(), canvas->width(), canvas->height(), 3, C_HEX(0x004194));
 	canvas->fillRoundRect(screen.getTotalX() + 2, screen.getTotalY() + 2, canvas->width() - 4, canvas->height() - 4, 3, C_HEX(0x0041ff));
-	screen.draw();
+    Battery.drawIcon(*canvas,111,4);
+    screen.draw();
 
 }
 
 void MiniMenu::Menu::loop(uint micros){
 
 	selectAccum += (float) micros / 1000000.0f;
-	TextElement* selectedText = muteText;
-	if(!ByteBoi.inFirmware()){
-		selectedText = selectedElement == 0 ? muteText : exit;
-	}
 	int8_t newX = selectedX + sin(selectAccum * 5.0f) * 3.0f;
-	selectedText->setX(newX);
+	texts[selectedElement]->setX(newX);
 	draw();
 	screen.commit();
 }
 
 void MiniMenu::Menu::buildUI(){
-	layout->setWHType(CHILDREN, CHILDREN);
-	layout->setPadding(5);
-	layout->setGutter(5);
+	layout->setWHType(PARENT, CHILDREN);
+	layout->setPadding(7);
 	layout->reflow();
 
-	audioLayout->setWHType(PARENT, CHILDREN);
-	audioLayout->addChild(muteText);
-	audioLayout->addChild(audioSwitch);
-	audioLayout->setPadding(3);
-	audioLayout->reflow();
+	RGBEnableLayout->setWHType(PARENT, CHILDREN);
+	RGBEnableLayout->addChild(ledText);
+	RGBEnableLayout->addChild(LEDSwitch);
+	RGBEnableLayout->setPadding(1);
+	RGBEnableLayout->reflow();
 
-	layout->addChild(audioLayout);
-	if(!ByteBoi.inFirmware()){
+	volumeLayout->setWHType(PARENT,CHILDREN);
+	volumeLayout->addChild(volumeText);
+	volumeLayout->addChild(volumeSlider);
+	volumeLayout->reflow();
+
+	layout->addChild(volumeLayout);
+	layout->addChild(RGBEnableLayout);
+	if(exit){
 		layout->addChild(exit);
 		exit->setFont(1);
 		exit->setSize(1);
@@ -167,12 +192,15 @@ void MiniMenu::Menu::buildUI(){
 	screen.addChild(layout);
 	screen.repos();
 
-	muteText->setText("Sound");
-	muteText->setFont(1);
-	muteText->setSize(1);
-	muteText->setColor(TFT_WHITE);
+	ledText->setText("LEDs");
+	ledText->setFont(1);
+	ledText->setSize(1);
+	ledText->setColor(TFT_WHITE);
 
-
+	volumeText->setText("Volume");
+	volumeText->setFont(1);
+	volumeText->setSize(1);
+	volumeText->setColor(TFT_WHITE);
 }
 
 void MiniMenu::Menu::returned(void* data){
