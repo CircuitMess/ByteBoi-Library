@@ -40,6 +40,7 @@ public:
 
 	void splash(void (* callback)() = nullptr);
 	void shutdown();
+	void fadeout();
 
 	static const char* SPIFFSgameRoot;
 	static const char* SPIFFSdataRoot;

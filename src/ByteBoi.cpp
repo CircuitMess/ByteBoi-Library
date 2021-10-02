@@ -99,11 +99,14 @@ bool ByteBoiImpl::inFirmware(){
 }
 
 bool ByteBoiImpl::isStandalone(){
-	return (strcmp(esp_ota_get_running_partition()->label, "game") != 0); //already in launcher partition
+	return (strcmp(esp_ota_get_running_partition()->label, "game") != 0);
 }
 
 void ByteBoiImpl::backToLauncher(){
-	if(inFirmware()) return;
+	if(inFirmware() || isStandalone()) return;
+
+	fadeout();
+	expander->pinWrite(BL_PIN, HIGH);
 
 	const esp_partition_t *partition = esp_ota_get_running_partition();
 	const esp_partition_t *partition2 = esp_ota_get_next_update_partition(partition);
@@ -170,6 +173,48 @@ void ByteBoiImpl::openMenu(){
 		ByteBoiImpl::popupMenu = new Menu(Context::getCurrentContext());
 		ByteBoiImpl::popupMenu->push(Context::getCurrentContext());
 	}
+}
+
+void ByteBoiImpl::fadeout(){
+	Sprite* canvas = display->getBaseSprite();
+
+	Color* logoBuffer = static_cast<Color*>(malloc(93*26*2));
+	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
+	if(logoFile){
+		logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
+		logoFile.close();
+	}else{
+		free(logoBuffer);
+		logoBuffer = nullptr;
+	}
+	canvas->clear(C_HEX(0x0041ff));
+	if(logoBuffer) canvas->drawIcon(logoBuffer, (display->getWidth() - 93) / 2, (display->getHeight() - 26) / 2, 93, 26);
+	display->commit();
+	delay(1000);
+
+	auto color = canvas->readPixelRGB(0, 0);
+	lgfx::rgb565_t pixel(0xffff);
+	while(color.B8() > 0){
+		color.set(color.R8() * 0.7, color.G8() * 0.7, color.B8() * 0.7);
+
+		canvas->clear(C_RGB(color.R8(), color.G8(), color.B8()));
+		if(logoBuffer){
+			pixel.set(pixel.R8() * 0.7, pixel.G8() * 0.7, pixel.G8() * 0.7);
+			Color c = pixel.operator unsigned short();
+			for(int i = 0; i < 93 * 26; i++){
+				if(logoBuffer[i] != TFT_TRANSPARENT){
+					logoBuffer[i] = c;
+				}
+			}
+			canvas->drawIcon(logoBuffer, (display->getWidth() - 93) / 2, (display->getHeight() - 26) / 2, 93, 26);
+		}
+
+		if(color.B8() < 3) color.set(0, 0, 0);
+		display->commit();
+	}
+	free(logoBuffer);
+	canvas->clear(TFT_BLACK);
+	display->commit();
 }
 
 void ByteBoiImpl::shutdown(){
