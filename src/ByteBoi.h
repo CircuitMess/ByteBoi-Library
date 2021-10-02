@@ -57,7 +57,18 @@ private:
 	static MiniMenu::Menu* popupMenu;
 
 	void (* splashCallback)() = nullptr;
-	uint32_t splashTime = 0;
+	uint32_t lastSplashDraw = 0;
+	uint32_t splashIndex = 0;
+	const RGBColor splashValues[8] = {
+			{ 46, 100, 0 },
+			{ 255, 30, 30 },
+			{ 200, 200, 30 },
+			{ 115, 30, 200 },
+			{ 30, 235, 50 },
+			{ 120, 30, 30 },
+			{ 230, 230, 30 },
+			{ 55, 115, 220 },
+	};
 };
 
 extern ByteBoiImpl ByteBoi;

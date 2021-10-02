@@ -228,51 +228,98 @@ void ByteBoiImpl::shutdown(){
 }
 
 void ByteBoiImpl::splash(void(* callback)()){
-	Color* logoBuffer = nullptr;
-	logoBuffer = static_cast<Color*>(ps_malloc(93*26*2));
+	Color* logoBuffer = static_cast<Color*>(ps_malloc(93*26*2));
 	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
 	if(!logoFile){
 		Serial.println("Error opening splash logo");
 		free(logoBuffer);
 		if(callback != nullptr){
 			splashCallback = nullptr;
-			splashTime = 0;
+			lastSplashDraw = 0;
 			callback();
 		}
 		return;
 	}
 	logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
 	logoFile.close();
+
 	display->getBaseSprite()->clear(C_HEX(0x0041ff));
-	display->getBaseSprite()->drawIcon(logoBuffer, (display->getWidth() / 2) - 46, (display->getHeight() / 2) - 13, 93, 26);
-	free(logoBuffer);
+	display->getBaseSprite()->drawIcon(logoBuffer, (display->getWidth() - 93) / 2, (display->getHeight() - 26) / 2, 93, 26);
 	display->commit();
-	if(callback == nullptr){
-		delay(2000);
-	}else{
-		splashCallback = callback;
-		LoopManager::addListener(this);
-		splashTime = millis();
+	free(logoBuffer);
+
+	splashCallback = callback;
+	lastSplashDraw = millis();
+	splashIndex = 0;
+	LoopManager::addListener(this);
+
+	if(splashCallback == nullptr){
+		while(lastSplashDraw){
+			loop(0);
+		}
 	}
-
-
 }
 
 void ByteBoiImpl::loop(uint micros){
-	if(splashTime == 0 || splashCallback == nullptr){
-		splashTime = 0;
+	uint32_t m = millis();
+
+	if(splashIndex > 9){
+		lastSplashDraw = 0;
+		splashIndex = 0;
 		splashCallback = nullptr;
 		LoopManager::removeListener(this);
 		return;
-	}
-	if(millis() - splashTime >= 2000){
+	}else if(splashIndex == 9){
+		if(m - lastSplashDraw < 1000) return;
+
+		lastSplashDraw = 0;
+		splashIndex = 0;
 		LoopManager::removeListener(this);
+
 		if(splashCallback != nullptr){
 			void(*callback)() = splashCallback;
 			splashCallback = nullptr;
-			splashTime = 0;
 			callback();
 		}
+
+		return;
+	}
+
+	if(m - lastSplashDraw >= 250){
+		lastSplashDraw = m;
+		Sprite* canvas = display->getBaseSprite();
+
+		if(splashIndex == 8){
+			auto bg = canvas->readPixelRGB(0, 0);
+
+			for(int i = 0; i < canvas->width(); i++){
+				for(int j = 0; j < canvas->height(); j++){
+					auto color = canvas->readPixelRGB(i, j);
+					uint8_t c = (!(color == bg)) * 255;
+					color.set(c, c, c);
+					canvas->fillRect(i, j, 1, 1, color.operator unsigned int());
+				}
+			}
+		}else{
+			auto bg = canvas->readPixelRGB(0, 0);
+			const RGBColor& c = splashValues[splashIndex];
+			int dr = (c.R8() - bg.B8()) + 256;
+			int dg = (c.G8() - bg.G8()) + 256;
+			int db = (c.B8() - bg.R8()) + 256;
+
+			for(int i = 0; i < canvas->width(); i++){
+				for(int j = 0; j < canvas->height(); j++){
+					auto color = canvas->readPixelRGB(i, j);
+					color.set((color.B8() + dr) % 256,
+							  (color.G8() + dg) % 256,
+							  (color.R8() + db) % 256);
+					canvas->fillRect(i, j, 1, 1, color.operator unsigned int());
+				}
+			}
+		}
+
+		display->commit();
+		splashIndex++;
 	}
 }
 
