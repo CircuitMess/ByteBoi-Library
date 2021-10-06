@@ -29,9 +29,32 @@ public:
 	static bool inFirmware();
 	static bool isStandalone();
 
-	//functions to be used by games
-	File openResource(const String& path, const char* mode);
-	File openData(const String& path, const char* mode);
+	/**
+	 * Open resource file. If calling this function from a standalone game, will return the file on SPIFFS located at the specified path.
+	 * When a game is started through the launcher, all the resources for the game will be copied to SPIFFS into the /game directory. If
+	 * called in a game started through the launcher, this function will then return the file located at /game<path>. Please note that
+	 * SPIFFS file path is limited to 32 characters, including directories and slashes.
+	 * @param path Path of the resource file. Make sure to use a leading slash.
+	 * @param mode
+	 * @return
+	 */
+	File openResource(const String& path, const char* mode = "r");
+
+	/**
+	 * Open data file. Intended for save files, highscores, and other data that should persist reboot. Opened file will be on SPIFFS at
+	 * /data/<ID><path>. Use ByteBoi.setGameID to set the ID. If the ID isn't set, this function will return an unopened file. Please
+	 * note that SPIFFS file path is limited to 32 characters, including directories and slashes.
+	 * @param path Path of the data file. Make sure to use a leading slash.
+	 * @param mode
+	 * @return
+	 */
+	File openData(const String& path, const char* mode = "r");
+
+	/**
+	 * Set game ID. Used for ByteBoi.openData. If more than 5 characters are passed, the ID will be truncated to 5 characters. Make sure
+	 * the ID is unique for the game to avoid overwriting save data for another game.
+	 * @param ID Unique identifier for the game.
+	 */
 	void setGameID(String ID);
 	void backToLauncher();
 	void bindMenu();
