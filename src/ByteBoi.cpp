@@ -122,7 +122,7 @@ InputI2C* ByteBoiImpl::getInput(){
 }
 
 void ByteBoiImpl::setGameID(String ID){
-	gameID = std::move(ID);
+	gameID = ID.substring(0, 5);
 }
 
 void ByteBoiImpl::bindMenu(){
