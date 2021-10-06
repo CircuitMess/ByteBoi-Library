@@ -85,13 +85,8 @@ File ByteBoiImpl::openResource(const String& path, const char* mode){
 }
 
 File ByteBoiImpl::openData(const String& path, const char* mode){
-	if(strcmp(esp_ota_get_running_partition()->label, "game") == 0){
-		if(gameID.length() == 0) return File(); //undefined game ID
-		return SPIFFS.open(String(SPIFFSdataRoot) + "/" + gameID + "/" + path, mode);
-	}else{
-		return SPIFFS.open(path, mode);
-	}
-
+	if(gameID.length() == 0) return File(); //undefined game ID
+	return SPIFFS.open(String(SPIFFSdataRoot) + "/" + gameID + path, mode);
 }
 
 bool ByteBoiImpl::inFirmware(){
