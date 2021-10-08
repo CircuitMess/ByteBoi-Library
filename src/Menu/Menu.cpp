@@ -61,10 +61,7 @@ void MiniMenu::Menu::bindInput(){
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
 		Piezo.tone(500, 50);
-		if(instance->selectedElement == 1){
-			instance->LEDSwitch->toggle();
-			Settings.get().RGBenable = instance->LEDSwitch->getState();
-		}else if(instance->selectedElement == 2){
+		if(instance->selectedElement == 2){
 			instance->stop();
 			ByteBoi.backToLauncher();
 		}
