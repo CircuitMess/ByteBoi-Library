@@ -10,6 +10,7 @@
 #include "Settings.h"
 #include "Battery/BatteryPopupService.h"
 #include "SleepService.h"
+#include "Bitmaps/ByteBoiLogo.hpp"
 #include <Loop/LoopManager.h>
 #include <esp_wifi.h>
 
@@ -223,25 +224,15 @@ void ByteBoiImpl::shutdown(){
 }
 
 void ByteBoiImpl::splash(void(* callback)()){
-	Color* logoBuffer = static_cast<Color*>(ps_malloc(93*26*2));
-	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
-	if(!logoFile){
-		Serial.println("Error opening splash logo");
-		free(logoBuffer);
 		if(callback != nullptr){
 			splashCallback = nullptr;
 			lastSplashDraw = 0;
 			callback();
 		}
-		return;
-	}
-	logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
-	logoFile.close();
 
 	display->getBaseSprite()->clear(C_HEX(0x0041ff));
-	display->getBaseSprite()->drawIcon(logoBuffer, (display->getWidth() - 93) / 2, (display->getHeight() - 26) / 2, 93, 26);
+	display->getBaseSprite()->drawIcon(logoIcon, (display->getWidth() - 93) / 2, (display->getHeight() - 26) / 2, 93, 26);
 	display->commit();
-	free(logoBuffer);
 
 	splashCallback = callback;
 	lastSplashDraw = millis();
