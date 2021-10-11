@@ -1,5 +1,10 @@
 #include "BatteryService.h"
 #include "../ByteBoi.h"
+#include "../Bitmaps/battery_0.hpp"
+#include "../Bitmaps/battery_1.hpp"
+#include "../Bitmaps/battery_2.hpp"
+#include "../Bitmaps/battery_3.hpp"
+#include "../Bitmaps/battery_4.hpp"
 #include <SPIFFS.h>
 #include <Loop/LoopManager.h>
 
@@ -58,22 +63,12 @@ void BatteryService::begin(){
 	ByteBoi.getExpander()->pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
 	pinMode(BATTERY_PIN, INPUT);
 
-	char filename[50];
-	for(uint8_t i = 0; i < 5; i++){
-		batteryBuffer[i] = static_cast<Color*>(ps_malloc(14 * 6 * 2));
-		sprintf(filename, "/launcher/battery_%d.raw", i);
+	batteryBuffer[0] = const_cast<Color*>(batteryIcon_0);
+	batteryBuffer[1] = const_cast<Color*>(batteryIcon_1);
+	batteryBuffer[2] = const_cast<Color*>(batteryIcon_2);
+	batteryBuffer[3] = const_cast<Color*>(batteryIcon_3);
+	batteryBuffer[4] = const_cast<Color*>(batteryIcon_4);
 
-		fs::File file = SPIFFS.open(filename);
-		if(!file){
-			printf("Failed opening battery icon: %s\n", filename);
-			free(batteryBuffer[i]);
-			batteryBuffer[i] = nullptr;
-			file.close();
-			continue;
-		}
-		file.read(reinterpret_cast<uint8_t*>(batteryBuffer[i]), 14 * 6 * 2);
-		file.close();
-	}
 }
 
 bool BatteryService::isCharging() const{
