@@ -224,12 +224,6 @@ void ByteBoiImpl::shutdown(){
 }
 
 void ByteBoiImpl::splash(void(* callback)()){
-		if(callback != nullptr){
-			splashCallback = nullptr;
-			lastSplashDraw = 0;
-			callback();
-		}
-
 	display->getBaseSprite()->clear(C_HEX(0x0041ff));
 	display->getBaseSprite()->drawIcon(logoIcon, (display->getWidth() - 93) / 2, (display->getHeight() - 26) / 2, 93, 26);
 	display->commit();
