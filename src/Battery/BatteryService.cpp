@@ -77,7 +77,11 @@ void BatteryService::begin(){
 }
 
 bool BatteryService::isCharging() const{
-	return (ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN));
+	if(getLevel() == 4){
+		return false;
+	}else{
+		return (ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN));
+	}
 }
 
 void BatteryService::drawIcon(Sprite &sprite, int16_t x, int16_t y){
