@@ -229,78 +229,29 @@ void ByteBoiImpl::splash(void(* callback)()){
 	display->commit();
 
 	splashCallback = callback;
-	lastSplashDraw = millis();
-	splashIndex = 0;
+	splashTime = millis();
 	LoopManager::addListener(this);
 
 	if(splashCallback == nullptr){
-		while(lastSplashDraw){
+		while(splashTime){
 			loop(0);
 		}
 	}
 }
 
 void ByteBoiImpl::loop(uint micros){
-	uint32_t m = millis();
-
-	if(splashIndex > 9){
-		lastSplashDraw = 0;
-		splashIndex = 0;
-		splashCallback = nullptr;
-		LoopManager::removeListener(this);
-		return;
-	}else if(splashIndex == 9){
-		if(m - lastSplashDraw < 1000) return;
-
-		lastSplashDraw = 0;
-		splashIndex = 0;
-		LoopManager::removeListener(this);
-
+	if(millis() - splashTime >= 1000){
+		splashTime = millis();
 		if(splashCallback != nullptr){
-			void(*callback)() = splashCallback;
+			void (* callback)() = splashCallback;
 			splashCallback = nullptr;
 			callback();
 		}
-
-		return;
+		LoopManager::removeListener(this);
+		splashTime = false;
 	}
 
-	if(m - lastSplashDraw >= 250){
-		lastSplashDraw = m;
-		Sprite* canvas = display->getBaseSprite();
-
-		if(splashIndex == 8){
-			auto bg = canvas->readPixelRGB(0, 0);
-
-			for(int i = 0; i < canvas->width(); i++){
-				for(int j = 0; j < canvas->height(); j++){
-					auto color = canvas->readPixelRGB(i, j);
-					uint8_t c = (!(color == bg)) * 255;
-					color.set(c, c, c);
-					canvas->fillRect(i, j, 1, 1, color.operator unsigned int());
-				}
-			}
-		}else{
-			auto bg = canvas->readPixelRGB(0, 0);
-			const RGBColor& c = splashValues[splashIndex];
-			int dr = (c.R8() - bg.B8()) + 256;
-			int dg = (c.G8() - bg.G8()) + 256;
-			int db = (c.B8() - bg.R8()) + 256;
-
-			for(int i = 0; i < canvas->width(); i++){
-				for(int j = 0; j < canvas->height(); j++){
-					auto color = canvas->readPixelRGB(i, j);
-					color.set((color.B8() + dr) % 256,
-							  (color.G8() + dg) % 256,
-							  (color.R8() + db) % 256);
-					canvas->fillRect(i, j, 1, 1, color.operator unsigned int());
-				}
-			}
-		}
-
-		display->commit();
-		splashIndex++;
-	}
 }
+
 
 

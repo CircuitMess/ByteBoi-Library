@@ -80,7 +80,7 @@ private:
 	static MiniMenu::Menu* popupMenu;
 
 	void (* splashCallback)() = nullptr;
-	uint32_t lastSplashDraw = 0;
+	uint32_t splashTime = 0;
 	uint32_t splashIndex = 0;
 	const RGBColor splashValues[8] = {
 			{ 46, 100, 0 },
