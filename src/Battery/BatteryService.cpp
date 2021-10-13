@@ -11,6 +11,11 @@
 const uint16_t BatteryService::measureInterval = 1; //in seconds
 
 void BatteryService::loop(uint micros){
+	if(!isCharging()){
+		maxVoltage = 4000 ;
+	}else{
+		maxVoltage = 4250 ;
+	}
 	measureMicros += micros;
 	if(measureMicros >= measureInterval * 1000000){
 		measureMicros = 0;
@@ -44,7 +49,7 @@ uint16_t BatteryService::getVoltage() const{
 }
 
 uint8_t BatteryService::getPercentage() const{
-	int16_t percentage = map(voltage, 3650, 4200, 0, 100);
+	int16_t percentage = map(voltage, 3650, maxVoltage, 0, 100);
 	if(percentage < 0){
 		return 0;
 	}else if(percentage > 100){
