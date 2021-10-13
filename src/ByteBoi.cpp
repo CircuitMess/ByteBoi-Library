@@ -40,13 +40,15 @@ void ByteBoiImpl::begin(){
 		Serial.println("No PSRAM detected");
 	}
 
-	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(false);
-	Piezo.setVolume(Settings.get().volume);
-
 	if(!SPIFFS.begin()){
 		Serial.println("SPIFFS error");
 	}
+
+	Settings.begin();
+
+	Piezo.begin(SPEAKER_PIN);
+	Piezo.setMute(false);
+	Piezo.setVolume(Settings.get().volume);
 
 	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
 	SPI.setFrequency(60000000);
@@ -68,8 +70,6 @@ void ByteBoiImpl::begin(){
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
 	LoopManager::addListener(Input::getInstance());
-
-	Settings.begin();
 
 	Context::setDeleteOnPop(true);
 
