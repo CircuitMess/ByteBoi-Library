@@ -175,14 +175,7 @@ void ByteBoiImpl::fadeout(){
 	Sprite* canvas = display->getBaseSprite();
 
 	Color* logoBuffer = static_cast<Color*>(malloc(93*26*2));
-	fs::File logoFile = SPIFFS.open("/launcher/ByteBoiLogo.raw");
-	if(logoFile){
-		logoFile.read(reinterpret_cast<uint8_t*>(logoBuffer), 93 * 26 * 2);
-		logoFile.close();
-	}else{
-		free(logoBuffer);
-		logoBuffer = nullptr;
-	}
+	memcpy_P(logoBuffer,logoIcon,93*26*2);
 	canvas->clear(C_HEX(0x0041ff));
 	if(logoBuffer) canvas->drawIcon(logoBuffer, (display->getWidth() - 93) / 2, (display->getHeight() - 26) / 2, 93, 26);
 	display->commit();
