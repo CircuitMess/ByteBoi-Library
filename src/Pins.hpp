@@ -10,6 +10,7 @@
 #define BTN_C 4
 
 #define SPEAKER_PIN 25
+#define SPEAKER_SD 13
 #define BL_PIN 12
 #define BATTERY_PIN 36
 

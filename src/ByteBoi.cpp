@@ -25,6 +25,10 @@ BatteryPopupService BatteryPopup;
 Menu* ByteBoiImpl::popupMenu = nullptr;
 
 void ByteBoiImpl::begin(){
+	pinMode(SPEAKER_SD, OUTPUT);
+	digitalWrite(SPEAKER_SD, HIGH);
+	delay(10);
+	dacWrite(SPEAKER_PIN, 127);
 
 	if(!inFirmware()){
 		esp_ota_set_boot_partition(esp_ota_get_next_update_partition(esp_ota_get_running_partition()));
@@ -35,11 +39,13 @@ void ByteBoiImpl::begin(){
 	}else{
 		Serial.println("No PSRAM detected");
 	}
+
+	Piezo.begin(SPEAKER_PIN);
+	Piezo.setMute(false);
+	Piezo.setVolume(Settings.get().volume);
+
 	if(!SPIFFS.begin()){
 		Serial.println("SPIFFS error");
-		SPIFFS.begin(true);
-		ESP.restart();
-//		for(;;);
 	}
 
 	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
@@ -57,6 +63,7 @@ void ByteBoiImpl::begin(){
 	expander->pinWrite(BL_PIN, 0);
 	LED.begin();
 	LED.setRGB(OFF);
+	expander->pinMode(SD_DETECT_PIN, INPUT);
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
@@ -65,9 +72,6 @@ void ByteBoiImpl::begin(){
 	Settings.begin();
 
 	Context::setDeleteOnPop(true);
-
-	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(Settings.get().volume);
 
 	Battery.begin();
 	LoopManager::addListener(&Sleep);
