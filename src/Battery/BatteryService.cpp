@@ -11,11 +11,6 @@
 const uint16_t BatteryService::measureInterval = 1; //in seconds
 
 void BatteryService::loop(uint micros){
-	if(!isCharging()){
-		maxVoltage = 4000 ;
-	}else{
-		maxVoltage = 4250 ;
-	}
 	measureMicros += micros;
 	if(measureMicros >= measureInterval * 1000000){
 		measureMicros = 0;
