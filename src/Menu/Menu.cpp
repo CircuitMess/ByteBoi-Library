@@ -99,7 +99,6 @@ void MiniMenu::Menu::bindInput(){
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}
 	});
-
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
@@ -113,6 +112,21 @@ void MiniMenu::Menu::bindInput(){
 		if(instance == nullptr) return;
 		instance->pop();
 	});
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
+		if(instance->selectedElement == 0){
+			instance->volumeSlider->moveSliderValue(1);
+		}
+		instance->draw();
+		instance->screen.commit();
+	});
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_LEFT, 200, [](uint){
+		if(instance->selectedElement == 0){
+			instance->volumeSlider->moveSliderValue(-1);
+		}
+		instance->draw();
+		instance->screen.commit();
+	});
+
 }
 
 void MiniMenu::Menu::releaseInput(){
