@@ -40,11 +40,15 @@ uint8_t BatteryService::getLevel() const{
 }
 
 uint16_t BatteryService::getVoltage() const{
-	return voltage;
+	if(ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN)){
+		return ((float)voltage - (2289.61 - 0.523723*(float)voltage));
+	}else{
+		return voltage;
+	}
 }
 
 uint8_t BatteryService::getPercentage() const{
-	int16_t percentage = map(voltage, 3650, maxVoltage, 0, 100);
+	int16_t percentage = map(getVoltage(), 3650, 4250, 0, 100);
 	if(percentage < 0){
 		return 0;
 	}else if(percentage > 100){
