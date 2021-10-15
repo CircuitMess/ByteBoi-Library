@@ -153,7 +153,29 @@ void MiniMenu::Menu::draw(){
 }
 
 void MiniMenu::Menu::loop(uint micros){
-
+	if(selectedElement == 1){
+		if(LEDSwitch->getState() && !previousState){
+			if(millis() - previousTime >= 100){
+				Serial.println("RGBon");
+				previousTime = millis();
+				if(rgbLED.getRGB() == OFF){
+					rgbLED.setRGB(static_cast<LEDColor>(LEDColor::WHITE));
+					LEDcounter++;
+				}else{
+					rgbLED.setRGB(OFF);
+				}
+				if(LEDcounter >= 10){
+					LEDcounter = 0;
+					previousTime = 0;
+					previousState = LEDSwitch->getState();
+				}
+			}
+		}else if(!LEDSwitch->getState() && previousState){
+			rgbLED.setRGB(OFF);
+			previousState = LEDSwitch->getState();
+			previousTime = 0;
+		}
+	}
 	selectAccum += (float) micros / 1000000.0f;
 	int8_t newX = selectedX + sin(selectAccum * 5.0f) * 3.0f;
 	texts[selectedElement]->setX(newX);

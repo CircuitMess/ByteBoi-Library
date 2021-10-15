@@ -8,6 +8,7 @@
 #include <Loop/LoopListener.h>
 #include "Switch.h"
 #include "SliderElement.h"
+#include "../ByteBoiLED.h"
 #include <Support/Modal.h>
 class Sprite;
 
@@ -48,6 +49,11 @@ namespace MiniMenu {
 
 		bool exiting = false;
 		bool stopping = false;
+
+		bool previousState = false;
+		uint16_t previousTime = 0;
+		ByteBoiLED rgbLED;
+		uint8_t LEDcounter = 0;
 
 		float selectAccum = 0;
 		uint8_t selectedX;
