@@ -52,7 +52,6 @@ namespace MiniMenu {
 
 		bool previousState = false;
 		uint16_t previousTime = 0;
-		ByteBoiLED rgbLED;
 		uint8_t LEDcounter = 0;
 
 		float selectAccum = 0;

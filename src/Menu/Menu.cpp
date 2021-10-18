@@ -156,13 +156,12 @@ void MiniMenu::Menu::loop(uint micros){
 	if(selectedElement == 1){
 		if(LEDSwitch->getState() && !previousState){
 			if(millis() - previousTime >= 100){
-				Serial.println("RGBon");
 				previousTime = millis();
-				if(rgbLED.getRGB() == OFF){
-					rgbLED.setRGB(static_cast<LEDColor>(LEDColor::WHITE));
+				if(LED.getRGB() == OFF){
+					LED.setRGB(static_cast<LEDColor>(LEDColor::WHITE));
 					LEDcounter++;
 				}else{
-					rgbLED.setRGB(OFF);
+					LED.setRGB(OFF);
 				}
 				if(LEDcounter >= 10){
 					LEDcounter = 0;
@@ -171,7 +170,7 @@ void MiniMenu::Menu::loop(uint micros){
 				}
 			}
 		}else if(!LEDSwitch->getState() && previousState){
-			rgbLED.setRGB(OFF);
+			LED.setRGB(OFF);
 			previousState = LEDSwitch->getState();
 			previousTime = 0;
 		}
