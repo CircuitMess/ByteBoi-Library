@@ -11,6 +11,7 @@
 #include "Battery/BatteryPopupService.h"
 #include "SleepService.h"
 #include "Bitmaps/ByteBoiLogo.hpp"
+#include "Playback/PlaybackSystem.h"
 #include <Loop/LoopManager.h>
 #include <esp_wifi.h>
 
@@ -45,6 +46,7 @@ void ByteBoiImpl::begin(){
 	}
 
 	Settings.begin();
+	Playback.updateGain();
 
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(false);
