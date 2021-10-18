@@ -17,10 +17,16 @@ void BatteryService::loop(uint micros){
 		maxVoltage = 4250 ;
 	}
 	measureMicros += micros;
-	if(measureMicros >= measureInterval * 1000000){
+	if(measureMicros >= measureInterval * 200000){
 		measureMicros = 0;
-		float x = analogRead(BATTERY_PIN);
-		voltage = (1.1 * x + 683);
+		x += analogRead(BATTERY_PIN);
+		xCounter++;
+		if(xCounter == 5){
+			x = x/5;
+			voltage = (1.1 * x + 683);
+			xCounter = 0;
+			x = 0;
+		}
 		if(getLevel() == 0 && !shutdownDisable && !isCharging()){
 			ByteBoi.shutdown();
 			return;

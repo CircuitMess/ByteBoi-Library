@@ -31,6 +31,8 @@ private:
 	uint32_t timePassed = 0;
 	uint8_t pictureIndex = 0;
 	uint16_t maxVoltage = 0;
+	float x = 0;
+	uint8_t xCounter = 0;
 };
 
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H
