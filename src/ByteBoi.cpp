@@ -46,11 +46,6 @@ void ByteBoiImpl::begin(){
 	}
 
 	Settings.begin();
-	Playback.updateGain();
-
-	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(false);
-	Piezo.setVolume(Settings.get().volume);
 
 	Playback.begin();
 
