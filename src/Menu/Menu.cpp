@@ -154,6 +154,9 @@ void MiniMenu::Menu::draw(){
 
 void MiniMenu::Menu::loop(uint micros){
 	if(selectedElement == 1){
+		if(!LEDSwitch->getState()){
+			LED.setRGB(OFF);
+		}
 		if(LEDSwitch->getState() && !previousState){
 			if(millis() - previousTime >= 100){
 				previousTime = millis();
