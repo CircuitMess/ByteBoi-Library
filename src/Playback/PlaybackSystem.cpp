@@ -36,6 +36,8 @@ bool PlaybackSystem::open(Sample* sample){
 
 void PlaybackSystem::play(Sample* sample){
 	open(sample);
+	Sched.loop(0);
+	sample->getSource()->seek(0, fs::SeekSet);
 	start();
 }
 
@@ -45,6 +47,8 @@ void PlaybackSystem::audioThread(Task* task){
 	Serial.println("-- PlaybackSystem started --");
 
 	while(task->running){
+		vTaskDelay(1);
+
 		PlaybackRequest* request;
 		while(system->queue.count()){
 			system->queue.receive(&request);
