@@ -13,6 +13,8 @@ public:
 
 private:
 	Source* source = nullptr;
+	fs::File sourceFile;
+
 };
 
 
