@@ -52,6 +52,8 @@ void ByteBoiImpl::begin(){
 	Piezo.setMute(false);
 	Piezo.setVolume(Settings.get().volume);
 
+	Playback.begin();
+
 	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
 	SPI.setFrequency(60000000);
 

@@ -9,13 +9,20 @@ PlaybackSystem::PlaybackSystem(Sample* sample) : PlaybackSystem(){
 }
 
 PlaybackSystem::PlaybackSystem() : audioTask("MixAudio", audioThread, 4 * 1024, this), queue(4, sizeof(PlaybackRequest*)){
-	out = new OutputDAC(SPEAKER_PIN, SPEAKER_SD);
-	updateGain();
 }
 
 PlaybackSystem::~PlaybackSystem(){
 	stop();
 	delete out;
+}
+
+void PlaybackSystem::begin(){
+	if(out){
+		delete out;
+	}
+
+	out = new OutputDAC(SPEAKER_PIN, SPEAKER_SD);
+	updateGain();
 }
 
 bool PlaybackSystem::open(Sample* sample){
@@ -130,6 +137,8 @@ void PlaybackSystem::_seek(uint16_t time) {
 }
 
 void PlaybackSystem::updateGain(){
+	if(!out) return;
+
 	out->setGain((float) Settings.get().volume / 255.0f);
 }
 

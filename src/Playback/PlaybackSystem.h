@@ -26,6 +26,8 @@ public:
 	PlaybackSystem(Sample* sample);
 	virtual ~PlaybackSystem();
 
+	void begin();
+
 	bool open(Sample* sample);
 	void play(Sample* sample);
 	void start();
@@ -50,7 +52,7 @@ private:
 	bool looping = false;
 	bool schedDisabled = false;
 
-	OutputDAC* out;
+	OutputDAC* out = nullptr;
 
 	Sample* currentSample = nullptr;
 
