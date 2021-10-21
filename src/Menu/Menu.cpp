@@ -61,14 +61,21 @@ void MiniMenu::Menu::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
-		Piezo.tone(500, 50);
-		if(instance->selectedElement == 1){
+		if(instance->selectedElement == 0){
+			if(instance->volumeSlider->getSliderValue() == 0){
+				instance->volumeSlider->setSliderValue(180);
+			}else{
+				instance->volumeSlider->setSliderValue(0);
+			}
+			Piezo.setVolume(instance->volumeSlider->getSliderValue());
+		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}else if(instance->selectedElement == 2){
 			instance->stop();
 			ByteBoi.backToLauncher();
 		}
+		Piezo.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){
