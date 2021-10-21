@@ -221,6 +221,8 @@ void ByteBoiImpl::shutdown(){
 	esp_wifi_stop();
 	btStop();
 	Piezo.noTone();
+	delay(100);
+	digitalWrite(SPEAKER_SD, HIGH);
 	esp_deep_sleep_start();
 }
 
