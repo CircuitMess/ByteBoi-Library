@@ -14,13 +14,13 @@ void BatteryService::loop(uint micros){
 	measureMicros += micros;
 	if(measureMicros >= measureInterval * 200000){
 		measureMicros = 0;
-		analogValue += analogRead(BATTERY_PIN);
-		meassureCounter++;
-		if(meassureCounter == 5){
-			analogValue = analogValue / 5;
-			voltage = (1.1 * analogValue + 683);
-			meassureCounter = 0;
-			analogValue = 0;
+		measureSum += analogRead(BATTERY_PIN);
+		measureCounter++;
+		if(measureCounter == 5){
+			measureSum = measureSum / 5;
+			voltage = (1.1 * measureSum + 683);
+			measureCounter = 0;
+			measureSum = 0;
 		}
 		if(getLevel() == 0 && !shutdownDisable && !isCharging()){
 			ByteBoi.shutdown();
