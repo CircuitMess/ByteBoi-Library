@@ -1,5 +1,6 @@
 #include "ByteBoiLED.h"
 #include "ByteBoi.h"
+#include "Settings.h"
 ByteBoiLED LED;
 
 const uint8_t rgbMap[] = {
@@ -20,6 +21,8 @@ void ByteBoiLED::begin(){
 }
 
 void ByteBoiLED::setRGB(LEDColor colour){
+	if(!Settings.get().RGBenable && colour != OFF) return;
+
 	currentColor = colour;
 	uint8_t color = rgbMap[(uint8_t)colour];
 	ByteBoi.getExpander()->pinWrite(LED_R, !(color & 0b1));
