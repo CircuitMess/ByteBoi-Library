@@ -46,6 +46,7 @@ void MiniMenu::Menu::stop(){
 	Settings.get().volume = instance->volumeSlider->getSliderValue();
 	Settings.get().RGBenable = instance->LEDSwitch->getState();
 	Settings.store();
+	Piezo.setVolume(Settings.get().volume);
 	releaseInput();
 	LoopManager::removeListener(this);
 
@@ -94,6 +95,8 @@ void MiniMenu::Menu::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->volumeSlider->moveSliderValue(1);
+			Piezo.setVolume(instance->volumeSlider->getSliderValue());
+			Piezo.tone(500, 100);
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
@@ -103,6 +106,8 @@ void MiniMenu::Menu::bindInput(){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->volumeSlider->moveSliderValue(-1);
+			Piezo.setVolume(instance->volumeSlider->getSliderValue());
+			Piezo.tone(500, 100);
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
@@ -113,16 +118,24 @@ void MiniMenu::Menu::bindInput(){
 		instance->pop();
 	});
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
-		if(instance->selectedElement == 0){
-			instance->volumeSlider->moveSliderValue(1);
-		}
+		if(instance == nullptr || instance->selectedElement != 0) return;
+
+		instance->volumeSlider->moveSliderValue(1);
+
+		Piezo.setVolume(instance->volumeSlider->getSliderValue());
+		Piezo.tone(500, 100);
+
 		instance->draw();
 		instance->screen.commit();
 	});
 	Input::getInstance()->setButtonHeldRepeatCallback(BTN_LEFT, 200, [](uint){
-		if(instance->selectedElement == 0){
-			instance->volumeSlider->moveSliderValue(-1);
-		}
+		if(instance == nullptr || instance->selectedElement != 0) return;
+
+		instance->volumeSlider->moveSliderValue(-1);
+
+		Piezo.setVolume(instance->volumeSlider->getSliderValue());
+		Piezo.tone(500, 100);
+
 		instance->draw();
 		instance->screen.commit();
 	});
@@ -137,6 +150,8 @@ void MiniMenu::Menu::releaseInput(){
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
 	Input::getInstance()->removeBtnPressCallback(BTN_B);
 	Input::getInstance()->removeBtnPressCallback(BTN_C);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
 }
 
 void MiniMenu::Menu::selectElement(uint8_t index){
