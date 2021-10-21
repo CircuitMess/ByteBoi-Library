@@ -11,6 +11,7 @@
 #include "Battery/BatteryPopupService.h"
 #include "SleepService.h"
 #include "Bitmaps/ByteBoiLogo.hpp"
+#include "Playback/PlaybackSystem.h"
 #include <Loop/LoopManager.h>
 #include <esp_wifi.h>
 
@@ -45,10 +46,13 @@ void ByteBoiImpl::begin(){
 	}
 
 	Settings.begin();
+	Playback.updateGain();
 
 	Piezo.begin(SPEAKER_PIN);
 	Piezo.setMute(false);
 	Piezo.setVolume(Settings.get().volume);
+
+	Playback.begin();
 
 	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
 	SPI.setFrequency(60000000);
@@ -217,6 +221,8 @@ void ByteBoiImpl::shutdown(){
 	esp_wifi_stop();
 	btStop();
 	Piezo.noTone();
+	delay(100);
+	digitalWrite(SPEAKER_SD, HIGH);
 	esp_deep_sleep_start();
 }
 

@@ -32,6 +32,7 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/DNSS
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/CircuitOS/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/TFT_eSPI)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/TFT_eSPI/Extensions)
+include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/LovyanGFX/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/U8g2_for_TFT_eSPI/src)
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/FDK-AAC/src)
 
@@ -48,6 +49,7 @@ include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/SPIF
 include_directories(${Arduino15}/packages/cm/hardware/esp32/1.2.4/libraries/Update/src)
 
 include_directories(${ArduinoLibs}/cpp-properties/src)
+include_directories(${ArduinoLibs}/CircuitMess-Audio/src)
 
 
 file(GLOB_RECURSE SOURCES "src/**.cpp" "src/**.c" "src/**.hpp" "src/**.h")
@@ -56,6 +58,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build)
 
 add_definitions(-DDEBUG)
 add_definitions(-DESP32)
+add_definitions(-DCIRCUITOS_LOVYANGFX)
+add_definitions(-DCIRCUITOS_PIEZO_DAC)
 
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_PROJECT_NAME}.ino PROPERTIES LANGUAGE CXX)
 
