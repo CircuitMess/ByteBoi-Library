@@ -4,6 +4,7 @@
 #include "../Settings.h"
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
+#include "../Playback/PlaybackSystem.h"
 
 MiniMenu::Menu* MiniMenu::Menu::instance = nullptr;
 
@@ -45,8 +46,16 @@ void MiniMenu::Menu::start(){
 void MiniMenu::Menu::stop(){
 	Settings.get().volume = instance->volumeSlider->getSliderValue();
 	Settings.get().RGBenable = instance->LEDSwitch->getState();
+	Playback.updateGain();
+
+	bool playing = Playback.isRunning();
+	Playback.stop();
+	delay(50);
 	Settings.store();
-	Piezo.setVolume(Settings.get().volume);
+	if(playing){
+		Playback.start();
+	}
+
 	releaseInput();
 	LoopManager::removeListener(this);
 
@@ -67,7 +76,9 @@ void MiniMenu::Menu::bindInput(){
 			}else{
 				instance->volumeSlider->setSliderValue(0);
 			}
-			Piezo.setVolume(instance->volumeSlider->getSliderValue());
+
+			Settings.get().volume = instance->volumeSlider->getSliderValue();
+			Playback.updateGain();
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
@@ -75,7 +86,7 @@ void MiniMenu::Menu::bindInput(){
 			instance->stop();
 			ByteBoi.backToLauncher();
 		}
-		Piezo.tone(500, 50);
+		Playback.tone(500, 100);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){
@@ -85,7 +96,7 @@ void MiniMenu::Menu::bindInput(){
 			instance->selectedElement = instance->layout->getChildren().size() - 1;
 		}
 		instance->selectElement(instance->selectedElement);
-		Piezo.tone(500, 50);
+		Playback.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_DOWN, [](){
@@ -95,30 +106,36 @@ void MiniMenu::Menu::bindInput(){
 			instance->selectedElement = 0;
 		}
 		instance->selectElement(instance->selectedElement);
-		Piezo.tone(500, 50);
+		Playback.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->volumeSlider->moveSliderValue(1);
-			Piezo.setVolume(instance->volumeSlider->getSliderValue());
-			Piezo.tone(500, 100);
+
+			Settings.get().volume = instance->volumeSlider->getSliderValue();
+			Playback.updateGain();
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}
+
+		Playback.tone(500, 100);
 	});
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->volumeSlider->moveSliderValue(-1);
-			Piezo.setVolume(instance->volumeSlider->getSliderValue());
-			Piezo.tone(500, 100);
+
+			Settings.get().volume = instance->volumeSlider->getSliderValue();
+			Playback.updateGain();
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}
+
+		Playback.tone(500, 100);
 	});
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
@@ -129,8 +146,10 @@ void MiniMenu::Menu::bindInput(){
 
 		instance->volumeSlider->moveSliderValue(1);
 
-		Piezo.setVolume(instance->volumeSlider->getSliderValue());
-		Piezo.tone(500, 100);
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+
+		Playback.tone(500, 100);
 
 		instance->draw();
 		instance->screen.commit();
@@ -140,8 +159,10 @@ void MiniMenu::Menu::bindInput(){
 
 		instance->volumeSlider->moveSliderValue(-1);
 
-		Piezo.setVolume(instance->volumeSlider->getSliderValue());
-		Piezo.tone(500, 100);
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+
+		Playback.tone(500, 100);
 
 		instance->draw();
 		instance->screen.commit();
