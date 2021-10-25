@@ -13,7 +13,11 @@
 #include <Audio/OutputDAC.h>
 #include <Util/Task.h>
 #include <Sync/Queue.h>
-#include "Sample.h"
+#include <Audio/Oscillator.h>
+#include <Audio/Mixer.h>
+#include <Audio/Wave.h>
+
+class Sample;
 
 struct PlaybackRequest {
 	enum { SEEK } type;
@@ -27,6 +31,9 @@ public:
 	virtual ~PlaybackSystem();
 
 	void begin();
+
+	void tone(uint16_t freq, uint16_t duration, Wave::Type type = Wave::SINE);
+	void noTone();
 
 	bool open(Sample* sample);
 	void play(Sample* sample);
@@ -51,10 +58,14 @@ private:
 	bool schedDisabled = false;
 
 	OutputDAC* out = nullptr;
+	Oscillator* oscillator = nullptr;
+	Mixer* mixer = nullptr;
 
 	Sample* currentSample = nullptr;
 
 	void _seek(uint16_t time);
+
+	void setMixRatio();
 };
 
 extern PlaybackSystem Playback;

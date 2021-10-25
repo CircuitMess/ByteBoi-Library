@@ -1,6 +1,8 @@
 #include "PlaybackSystem.h"
 #include "../Settings.h"
 #include "../Pins.hpp"
+#include "Sample.h"
+
 
 PlaybackSystem Playback;
 
@@ -9,11 +11,19 @@ PlaybackSystem::PlaybackSystem(Sample* sample) : PlaybackSystem(){
 }
 
 PlaybackSystem::PlaybackSystem() : audioTask("MixAudio", audioThread, 4 * 1024, this), queue(4, sizeof(PlaybackRequest*)){
+	oscillator = new Oscillator();
+	mixer = new Mixer();
+
+	mixer->addSource(oscillator);
+	mixer->addSource(nullptr);
+	mixer->setMixRatio(127);
 }
 
 PlaybackSystem::~PlaybackSystem(){
 	stop();
 	delete out;
+	delete oscillator;
+	delete mixer;
 }
 
 void PlaybackSystem::begin(){
@@ -22,23 +32,18 @@ void PlaybackSystem::begin(){
 	}
 
 	out = new OutputDAC(SPEAKER_PIN, SPEAKER_SD);
+	out->setSource(mixer);
 	updateGain();
 }
 
-bool PlaybackSystem::open(Sample* sample){
-	stop();
-
-	this->currentSample = sample;
-	out->setSource(sample->getSource());
-
-	return true;
+void PlaybackSystem::tone(uint16_t freq, uint16_t duration, Wave::Type type){
+	oscillator->tone(freq, duration, type);
+	mixer->resumeChannel(0);
+	start();
 }
 
-void PlaybackSystem::play(Sample* sample){
-	open(sample);
-	Sched.loop(0);
-	sample->getSource()->seek(0, fs::SeekSet);
-	start();
+void PlaybackSystem::noTone(){
+	oscillator->noTone();
 }
 
 void PlaybackSystem::audioThread(Task* task){
@@ -69,14 +74,21 @@ void PlaybackSystem::audioThread(Task* task){
 			Sched.loop(0);
 		}
 
+		system->setMixRatio();
+
 		if(system->out->isRunning()){
 			system->out->loop(0);
-		}else if(system->running){
-			if(system->looping){
-				system->seek(0);
-				system->out->start();
+		}else{
+			printf("System done\n");
+			break;
+		}
+
+		Sample* sample = system->currentSample;
+		if(sample != nullptr && sample->getSource()->available() == 0){
+			if(sample->isLooping()){
+				sample->getSource()->seek(0, fs::SeekSet);
 			}else{
-				system->running = false;
+				system->mixer->setSource(1, nullptr);
 			}
 		}
 	}
@@ -84,9 +96,30 @@ void PlaybackSystem::audioThread(Task* task){
 	system->running = false;
 }
 
+bool PlaybackSystem::open(Sample* sample){
+	stop();
+
+	this->currentSample = sample;
+
+	return true;
+}
+
+void PlaybackSystem::play(Sample* sample){
+	open(sample);
+	sample->getSource()->seek(0, fs::SeekSet);
+	Sched.loop(0);
+	start();
+}
+
 void PlaybackSystem::start(){
+	if(currentSample != nullptr){
+		mixer->setSource(1, currentSample->getSource());
+		mixer->resumeChannel(1);
+	}
+
+	setMixRatio();
+
 	if(running) return;
-	if(!currentSample) return;
 
 	running = true;
 	out->start();
@@ -94,11 +127,22 @@ void PlaybackSystem::start(){
 }
 
 void PlaybackSystem::stop(){
-	if(!running) return;
+	mixer->setSource(1, nullptr);
+	currentSample = nullptr;
+	setMixRatio();
+}
 
-	audioTask.stop(true);
-	out->stop();
-	running = false;
+void PlaybackSystem::setMixRatio(){
+	size_t osc = oscillator->available();
+	size_t sam = currentSample ? currentSample->getSource()->available() : 0;
+
+	if(osc && sam){
+		mixer->setMixRatio(50);
+	}else if(osc){
+		mixer->setMixRatio(0);
+	}else if(sam){
+		mixer->setMixRatio(255);
+	}
 }
 
 bool PlaybackSystem::isRunning(){
