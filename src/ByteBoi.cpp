@@ -5,13 +5,10 @@
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
 #include <Loop/LoopManager.h>
-#include "ByteBoiLED.h"
 #include "Menu/Menu.h"
-#include "Settings.h"
 #include "Battery/BatteryPopupService.h"
 #include "SleepService.h"
 #include "Bitmaps/ByteBoiLogo.hpp"
-#include "Playback/PlaybackSystem.h"
 #include <Loop/LoopManager.h>
 #include <esp_wifi.h>
 

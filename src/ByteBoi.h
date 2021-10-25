@@ -10,11 +10,14 @@
 #include <Audio/Piezo.h>
 #include <vector>
 #include <FS.h>
-#include "Pins.hpp"
 #include <Input/InputListener.h>
+#include "Pins.hpp"
+#include "Menu/Menu.h"
+#include "Playback/PlaybackSystem.h"
+#include "ByteBoiLED.h"
+#include "Settings.h"
 #include "Battery/BatteryService.h"
 #include "Battery/BatteryPopupService.h"
-#include "Menu/Menu.h"
 
 class ByteBoiImpl : public InputListener, public LoopListener{
 public:
