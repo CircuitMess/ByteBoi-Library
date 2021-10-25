@@ -212,7 +212,7 @@ void ByteBoiImpl::shutdown(){
 	LED.setRGB(OFF);
 	esp_wifi_stop();
 	btStop();
-	Piezo.noTone();
+	Playback.stop();
 	delay(100);
 	digitalWrite(SPEAKER_SD, HIGH);
 	esp_deep_sleep_start();

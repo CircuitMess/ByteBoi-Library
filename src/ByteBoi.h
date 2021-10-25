@@ -7,7 +7,6 @@
 #include <Display/Sprite.h>
 #include <Input/I2cExpander.h>
 #include <Input/InputI2C.h>
-#include <Audio/Piezo.h>
 #include <vector>
 #include <FS.h>
 #include <Input/InputListener.h>
@@ -23,7 +22,7 @@ class ByteBoiImpl : public InputListener, public LoopListener{
 public:
 
 	/**
-	 * Initializes display, backlight, Piezo, I2C expander, I2C input, and pre-registers all buttons.
+	 * Initializes display, Playback, Battery, I2C expander, I2C input, and pre-registers all buttons.
 	 */
 	void begin();
 	Display* getDisplay();
