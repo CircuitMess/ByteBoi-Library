@@ -14,9 +14,9 @@
 #define BL_PIN 12
 #define BATTERY_PIN 36
 
-#define LED_G 13
-#define LED_B 15
 #define LED_R 14
+#define LED_G 15
+#define LED_B 13
 #define CHARGE_DETECT_PIN 10
 #define SD_DETECT_PIN 8
 #define TT1 &TomThumb
