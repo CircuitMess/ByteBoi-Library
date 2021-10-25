@@ -3,18 +3,24 @@
 
 #include <CMAudio.h>
 #include <Audio/Source.h>
+#include "PlaybackSystem.h"
 
 class Sample {
+friend PlaybackSystem;
 public:
 	Sample(fs::File file, bool preload = false);
 	virtual ~Sample();
 
-	Source* getSource() const;
+	bool isLooping() const;
+	void setLooping(bool looping);
 
 private:
 	Source* source = nullptr;
 	fs::File sourceFile;
 
+	Source* getSource() const;
+
+	bool looping = false;
 };
 
 

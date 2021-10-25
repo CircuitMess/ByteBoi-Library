@@ -126,16 +126,8 @@ void PlaybackSystem::seek(uint16_t time) {
 	queue.send(&request);
 }
 
-void PlaybackSystem::setLoop(bool loop) {
-	looping = loop;
-}
-
 void PlaybackSystem::_seek(uint16_t time) {
 	if(!currentSample) return;
-
-	if(out->isRunning()) {
-		i2s_zero_dma_buffer((i2s_port_t) 0);
-	}
 
 	currentSample->getSource()->seek(time, SeekSet);
 }

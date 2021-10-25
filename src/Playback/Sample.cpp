@@ -16,6 +16,8 @@ Sample::Sample(fs::File file, bool preload){
 		source = new SourceWAV(sourceFile);
 	}
 
+	Sched.loop(0);
+
 	if(preload){
 		file.close();
 	}
@@ -28,4 +30,12 @@ Sample::~Sample(){
 
 Source* Sample::getSource() const{
 	return source;
+}
+
+bool Sample::isLooping() const{
+	return looping;
+}
+
+void Sample::setLooping(bool looping){
+	Sample::looping = looping;
 }

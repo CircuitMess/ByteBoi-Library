@@ -43,13 +43,11 @@ public:
 	void seek(uint16_t time);
 
 	void disableScheduler(bool schedDisabled);
-	void setLoop(bool loop);
 	void updateGain();
 
 private:
 	bool running = false;
 	Queue queue;
-	bool looping = false;
 	bool schedDisabled = false;
 
 	OutputDAC* out = nullptr;
