@@ -45,6 +45,7 @@ void MiniMenu::Menu::start(){
 void MiniMenu::Menu::stop(){
 	Settings.get().volume = instance->volumeSlider->getSliderValue();
 	Settings.get().RGBenable = instance->LEDSwitch->getState();
+	LED.setRGB(OFF);
 	Settings.store();
 	releaseInput();
 	LoopManager::removeListener(this);
