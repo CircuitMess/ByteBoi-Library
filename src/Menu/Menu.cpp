@@ -47,11 +47,10 @@ void MiniMenu::Menu::stop(){
 	Settings.get().volume = instance->volumeSlider->getSliderValue();
 	Settings.get().RGBenable = instance->LEDSwitch->getState();
 	Playback.updateGain();
-
+	LED.setRGB(OFF);
 	bool playing = Playback.isRunning();
 	Playback.stop();
 	delay(50);
-	LED.setRGB(OFF);
 	Settings.store();
 	if(playing){
 		Playback.start();
@@ -179,8 +178,8 @@ void MiniMenu::Menu::releaseInput(){
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
 	Input::getInstance()->removeBtnPressCallback(BTN_B);
 	Input::getInstance()->removeBtnPressCallback(BTN_C);
-	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
-	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
+	//Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
+	//Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
 }
 
 void MiniMenu::Menu::selectElement(uint8_t index){
