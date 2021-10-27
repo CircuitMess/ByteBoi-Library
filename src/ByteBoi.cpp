@@ -5,13 +5,10 @@
 #include <esp_partition.h>
 #include <esp_ota_ops.h>
 #include <Loop/LoopManager.h>
-#include "ByteBoiLED.h"
 #include "Menu/Menu.h"
-#include "Settings.h"
 #include "Battery/BatteryPopupService.h"
 #include "SleepService.h"
 #include "Bitmaps/ByteBoiLogo.hpp"
-#include "Playback/PlaybackSystem.h"
 #include <Loop/LoopManager.h>
 #include <esp_wifi.h>
 
@@ -46,11 +43,8 @@ void ByteBoiImpl::begin(){
 	}
 
 	Settings.begin();
-	Playback.updateGain();
 
-	Piezo.begin(SPEAKER_PIN);
-	Piezo.setMute(false);
-	Piezo.setVolume(Settings.get().volume);
+	Playback.begin();
 
 	SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_SS);
 	SPI.setFrequency(60000000);
@@ -218,7 +212,9 @@ void ByteBoiImpl::shutdown(){
 	LED.setRGB(OFF);
 	esp_wifi_stop();
 	btStop();
-	Piezo.noTone();
+	Playback.stop();
+	delay(100);
+	digitalWrite(SPEAKER_SD, HIGH);
 	esp_deep_sleep_start();
 }
 

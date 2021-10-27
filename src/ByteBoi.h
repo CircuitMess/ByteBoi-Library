@@ -7,20 +7,22 @@
 #include <Display/Sprite.h>
 #include <Input/I2cExpander.h>
 #include <Input/InputI2C.h>
-#include <Audio/Piezo.h>
 #include <vector>
 #include <FS.h>
-#include "Pins.hpp"
 #include <Input/InputListener.h>
+#include "Pins.hpp"
+#include "Menu/Menu.h"
+#include "Playback/PlaybackSystem.h"
+#include "ByteBoiLED.h"
+#include "Settings.h"
 #include "Battery/BatteryService.h"
 #include "Battery/BatteryPopupService.h"
-#include "Menu/Menu.h"
 
 class ByteBoiImpl : public InputListener, public LoopListener{
 public:
 
 	/**
-	 * Initializes display, backlight, Piezo, I2C expander, I2C input, and pre-registers all buttons.
+	 * Initializes display, Playback, Battery, I2C expander, I2C input, and pre-registers all buttons.
 	 */
 	void begin();
 	Display* getDisplay();
@@ -81,17 +83,6 @@ private:
 
 	void (* splashCallback)() = nullptr;
 	uint32_t splashTime = 0;
-	uint32_t splashIndex = 0;
-	const RGBColor splashValues[8] = {
-			{ 46, 100, 0 },
-			{ 255, 30, 30 },
-			{ 200, 200, 30 },
-			{ 115, 30, 200 },
-			{ 30, 235, 50 },
-			{ 120, 30, 30 },
-			{ 230, 230, 30 },
-			{ 55, 115, 220 },
-	};
 };
 
 extern ByteBoiImpl ByteBoi;

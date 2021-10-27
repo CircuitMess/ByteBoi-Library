@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 enum LEDColor {
-		OFF, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE
+		OFF, RED, GREEN, BLUE, YELLOW, MAGENTA, CYAN, WHITE
 };
 class ByteBoiLED {
 public:

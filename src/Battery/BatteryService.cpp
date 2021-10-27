@@ -11,16 +11,17 @@
 const uint16_t BatteryService::measureInterval = 1; //in seconds
 
 void BatteryService::loop(uint micros){
-	if(!isCharging()){
-		maxVoltage = 4000 ;
-	}else{
-		maxVoltage = 4250 ;
-	}
 	measureMicros += micros;
-	if(measureMicros >= measureInterval * 1000000){
+	if(measureMicros >= measureInterval * 200000){
 		measureMicros = 0;
-		float x = analogRead(BATTERY_PIN);
-		voltage = (1.1 * x + 683);
+		measureSum += analogRead(BATTERY_PIN);
+		measureCounter++;
+		if(measureCounter == 5){
+			measureSum = measureSum / 5;
+			voltage = (1.1 * measureSum + 683);
+			measureCounter = 0;
+			measureSum = 0;
+		}
 		if(getLevel() == 0 && !shutdownDisable && !isCharging()){
 			ByteBoi.shutdown();
 			return;
@@ -45,11 +46,15 @@ uint8_t BatteryService::getLevel() const{
 }
 
 uint16_t BatteryService::getVoltage() const{
-	return voltage;
+	if(ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN)){
+		return ((float)voltage - (2289.61 - 0.523723*(float)voltage));
+	}else{
+		return voltage;
+	}
 }
 
 uint8_t BatteryService::getPercentage() const{
-	int16_t percentage = map(voltage, 3650, maxVoltage, 0, 100);
+	int16_t percentage = map(getVoltage(), 3650, 4250, 0, 100);
 	if(percentage < 0){
 		return 0;
 	}else if(percentage > 100){

@@ -30,7 +30,8 @@ private:
 	Color* batteryBuffer[6] = {nullptr};
 	uint32_t timePassed = 0;
 	uint8_t pictureIndex = 0;
-	uint16_t maxVoltage = 0;
+	float measureSum = 0;
+	uint8_t measureCounter = 0;
 };
 
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H

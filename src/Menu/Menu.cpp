@@ -4,6 +4,7 @@
 #include "../Settings.h"
 #include <SPIFFS.h>
 #include <FS/CompressedFile.h>
+#include "../Playback/PlaybackSystem.h"
 
 MiniMenu::Menu* MiniMenu::Menu::instance = nullptr;
 
@@ -45,8 +46,17 @@ void MiniMenu::Menu::start(){
 void MiniMenu::Menu::stop(){
 	Settings.get().volume = instance->volumeSlider->getSliderValue();
 	Settings.get().RGBenable = instance->LEDSwitch->getState();
+	Playback.updateGain();
+
+	bool playing = Playback.isRunning();
+	Playback.stop();
+	delay(50);
 	LED.setRGB(OFF);
 	Settings.store();
+	if(playing){
+		Playback.start();
+	}
+
 	releaseInput();
 	LoopManager::removeListener(this);
 
@@ -61,14 +71,23 @@ void MiniMenu::Menu::bindInput(){
 
 	Input::getInstance()->setBtnPressCallback(BTN_A, [](){
 		if(instance == nullptr) return;
-		Piezo.tone(500, 50);
-		if(instance->selectedElement == 1){
+		if(instance->selectedElement == 0){
+			if(instance->volumeSlider->getSliderValue() == 0){
+				instance->volumeSlider->setSliderValue(180);
+			}else{
+				instance->volumeSlider->setSliderValue(0);
+			}
+
+			Settings.get().volume = instance->volumeSlider->getSliderValue();
+			Playback.updateGain();
+		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}else if(instance->selectedElement == 2){
 			instance->stop();
 			ByteBoi.backToLauncher();
 		}
+		Playback.tone(500, 100);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_UP, [](){
@@ -78,7 +97,7 @@ void MiniMenu::Menu::bindInput(){
 			instance->selectedElement = instance->layout->getChildren().size() - 1;
 		}
 		instance->selectElement(instance->selectedElement);
-		Piezo.tone(500, 50);
+		Playback.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_DOWN, [](){
@@ -88,32 +107,68 @@ void MiniMenu::Menu::bindInput(){
 			instance->selectedElement = 0;
 		}
 		instance->selectElement(instance->selectedElement);
-		Piezo.tone(500, 50);
+		Playback.tone(500, 50);
 	});
 
 	Input::getInstance()->setBtnPressCallback(BTN_RIGHT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->volumeSlider->moveSliderValue(1);
+
+			Settings.get().volume = instance->volumeSlider->getSliderValue();
+			Playback.updateGain();
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}
-	});
 
+		Playback.tone(500, 100);
+	});
 	Input::getInstance()->setBtnPressCallback(BTN_LEFT, [](){
 		if(instance == nullptr) return;
 		if(instance->selectedElement == 0){
 			instance->volumeSlider->moveSliderValue(-1);
+
+			Settings.get().volume = instance->volumeSlider->getSliderValue();
+			Playback.updateGain();
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
 		}
+
+		Playback.tone(500, 100);
 	});
 	Input::getInstance()->setBtnPressCallback(BTN_C, [](){
 		if(instance == nullptr) return;
 		instance->pop();
 	});
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_RIGHT, 200, [](uint){
+		if(instance == nullptr || instance->selectedElement != 0) return;
+
+		instance->volumeSlider->moveSliderValue(1);
+
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+
+		Playback.tone(500, 100);
+
+		instance->draw();
+		instance->screen.commit();
+	});
+	Input::getInstance()->setButtonHeldRepeatCallback(BTN_LEFT, 200, [](uint){
+		if(instance == nullptr || instance->selectedElement != 0) return;
+
+		instance->volumeSlider->moveSliderValue(-1);
+
+		Settings.get().volume = instance->volumeSlider->getSliderValue();
+		Playback.updateGain();
+
+		Playback.tone(500, 100);
+
+		instance->draw();
+		instance->screen.commit();
+	});
+
 }
 
 void MiniMenu::Menu::releaseInput(){
@@ -124,6 +179,8 @@ void MiniMenu::Menu::releaseInput(){
 	Input::getInstance()->removeBtnPressCallback(BTN_A);
 	Input::getInstance()->removeBtnPressCallback(BTN_B);
 	Input::getInstance()->removeBtnPressCallback(BTN_C);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_LEFT);
+	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
 }
 
 void MiniMenu::Menu::selectElement(uint8_t index){

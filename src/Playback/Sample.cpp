@@ -5,7 +5,7 @@
 #include <Audio/SourceWAV.h>
 
 Sample::Sample(fs::File file, bool preload){
-	fs::File sourceFile = preload ? RamFile::open(file) : file;
+	sourceFile = preload ? RamFile::open(file) : file;
 
 	String fname = file.name();
 	fname.toLowerCase();
@@ -15,12 +15,27 @@ Sample::Sample(fs::File file, bool preload){
 	}else{
 		source = new SourceWAV(sourceFile);
 	}
+
+	Sched.loop(0);
+
+	if(preload){
+		file.close();
+	}
 }
 
 Sample::~Sample(){
+	sourceFile.close();
 	delete source;
 }
 
 Source* Sample::getSource() const{
 	return source;
+}
+
+bool Sample::isLooping() const{
+	return looping;
+}
+
+void Sample::setLooping(bool looping){
+	Sample::looping = looping;
 }
