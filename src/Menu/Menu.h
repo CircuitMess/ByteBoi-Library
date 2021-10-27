@@ -50,8 +50,9 @@ namespace MiniMenu {
 		bool exiting = false;
 		bool stopping = false;
 
-		bool previousState = false;
-		uint16_t previousTime = 0;
+		bool ledsBlinking = false;
+		bool previousLEDState = false;
+		uint16_t previousLEDTime = 0;
 		uint8_t LEDcounter = 0;
 
 		float selectAccum = 0;

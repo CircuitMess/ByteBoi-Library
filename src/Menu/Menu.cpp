@@ -153,13 +153,21 @@ void MiniMenu::Menu::draw(){
 }
 
 void MiniMenu::Menu::loop(uint micros){
-	if(selectedElement == 1){
-		if(!LEDSwitch->getState()){
-			LED.setRGB(OFF);
-		}
-		if(LEDSwitch->getState() && !previousState){
-			if(millis() - previousTime >= 100){
-				previousTime = millis();
+	if(LEDSwitch->getState()){
+		ledsBlinking = true;
+	}else{
+		ledsBlinking = false;
+		LED.setRGB(OFF);
+		previousLEDState = LEDSwitch->getState();
+		LEDcounter = 0;
+	}
+	if(ledsBlinking){
+		Serial.println(LEDcounter);
+		Serial.println(previousLEDState);
+		Serial.println(previousLEDTime);
+		if(LEDSwitch->getState() && !previousLEDState){
+			if(millis() - previousLEDTime >= 100){
+				previousLEDTime = millis();
 				if(LED.getRGB() == OFF){
 					LED.setRGB(static_cast<LEDColor>(LEDColor::WHITE));
 					LEDcounter++;
@@ -168,14 +176,14 @@ void MiniMenu::Menu::loop(uint micros){
 				}
 				if(LEDcounter >= 10){
 					LEDcounter = 0;
-					previousTime = 0;
-					previousState = LEDSwitch->getState();
+					previousLEDTime = 0;
+					previousLEDState = LEDSwitch->getState();
 				}
 			}
-		}else if(!LEDSwitch->getState() && previousState){
+		}else if(!LEDSwitch->getState() && previousLEDState){
 			LED.setRGB(OFF);
-			previousState = LEDSwitch->getState();
-			previousTime = 0;
+			previousLEDState = LEDSwitch->getState();
+			previousLEDTime = 0;
 		}
 	}
 	selectAccum += (float) micros / 1000000.0f;
