@@ -23,7 +23,6 @@ private:
 	Modal* prevModal = nullptr;
 	static WarningPopup* instance;
 
-	Color* batteryIconBuffer = nullptr;
 };
 
 
