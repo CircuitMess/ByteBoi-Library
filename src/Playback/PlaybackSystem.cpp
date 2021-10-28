@@ -37,6 +37,8 @@ void PlaybackSystem::begin(){
 }
 
 void PlaybackSystem::tone(uint16_t freq, uint16_t duration, Wave::Type type){
+	if(Settings.get().volume == 0) return;
+
 	oscillator->tone(freq, duration, type);
 	mixer->resumeChannel(0);
 	start();
@@ -112,6 +114,8 @@ void PlaybackSystem::play(Sample* sample){
 }
 
 void PlaybackSystem::start(){
+	if(Settings.get().volume == 0) return;
+
 	if(currentSample != nullptr){
 		mixer->setSource(1, currentSample->getSource());
 		mixer->resumeChannel(1);
