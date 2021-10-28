@@ -51,8 +51,6 @@ void PlaybackSystem::noTone(){
 void PlaybackSystem::audioThread(Task* task){
 	PlaybackSystem* system = static_cast<PlaybackSystem*>(task->arg);
 
-	Serial.println("-- PlaybackSystem started --");
-
 	while(task->running){
 		vTaskDelay(1);
 
@@ -81,7 +79,6 @@ void PlaybackSystem::audioThread(Task* task){
 		if(system->out->isRunning()){
 			system->out->loop(0);
 		}else{
-			printf("System done\n");
 			break;
 		}
 
