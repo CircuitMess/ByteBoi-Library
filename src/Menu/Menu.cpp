@@ -82,6 +82,7 @@ void MiniMenu::Menu::bindInput(){
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
+			if(!Settings.get().RGBenable) LED.setRGB(OFF);
 		}else if(instance->selectedElement == 2){
 			instance->stop();
 			ByteBoi.backToLauncher();
@@ -119,6 +120,7 @@ void MiniMenu::Menu::bindInput(){
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
+			if(!Settings.get().RGBenable) LED.setRGB(OFF);
 		}
 
 		Playback.tone(500, 100);
@@ -133,6 +135,7 @@ void MiniMenu::Menu::bindInput(){
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
+			if(!Settings.get().RGBenable) LED.setRGB(OFF);
 		}
 
 		Playback.tone(500, 100);
