@@ -91,6 +91,7 @@ void PlaybackSystem::audioThread(Task* task){
 				sample->getSource()->seek(0, fs::SeekSet);
 			}else{
 				system->mixer->setSource(1, nullptr);
+				system->currentSample = nullptr;
 			}
 		}
 	}
@@ -99,10 +100,7 @@ void PlaybackSystem::audioThread(Task* task){
 }
 
 bool PlaybackSystem::open(Sample* sample){
-	stop();
-
 	this->currentSample = sample;
-
 	return true;
 }
 
