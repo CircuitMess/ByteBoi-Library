@@ -11,6 +11,8 @@
 #include "Bitmaps/ByteBoiLogo.hpp"
 #include <Loop/LoopManager.h>
 #include <esp_wifi.h>
+#include <esp_bt.h>
+#include <driver/adc.h>
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
@@ -208,13 +210,17 @@ void ByteBoiImpl::fadeout(){
 
 void ByteBoiImpl::shutdown(){
 	display->getTft()->sleep();
-	expander->pinMode(BL_PIN, 1);
+	expander->pinWrite(BL_PIN, HIGH);
 	LED.setRGB(OFF);
-	esp_wifi_stop();
-	btStop();
 	Playback.stop();
 	delay(100);
 	digitalWrite(SPEAKER_SD, HIGH);
+#ifndef BYTEBOI_LAUNCHER
+	btStop();
+	esp_bt_controller_disable();
+	esp_wifi_stop();
+#endif
+	adc_power_off();
 	esp_deep_sleep_start();
 }
 
