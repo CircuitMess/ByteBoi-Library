@@ -7,7 +7,7 @@ SleepService Sleep;
 void SleepService::loop(uint time){
 	if(Settings.get().shutdownTime != 0){
 		autoShutdownMicros += time;
-		if(autoShutdownMicros >= Settings.get().shutdownTime*1000000){
+		if(autoShutdownMicros >= Settings.get().shutdownTime*1000000*60){
 			ByteBoi.shutdown();
 			return;
 		}
