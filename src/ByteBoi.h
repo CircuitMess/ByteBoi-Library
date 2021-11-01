@@ -13,6 +13,7 @@
 #include "Pins.hpp"
 #include "Menu/Menu.h"
 #include "Playback/PlaybackSystem.h"
+#include "Playback/Sample.h"
 #include "ByteBoiLED.h"
 #include "Settings.h"
 #include "Battery/BatteryService.h"
