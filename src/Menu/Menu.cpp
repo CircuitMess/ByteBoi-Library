@@ -59,6 +59,7 @@ void MiniMenu::Menu::stop(){
 	releaseInput();
 	LoopManager::removeListener(this);
 
+	LED.setRGB(LEDColor::OFF);
 }
 
 void MiniMenu::Menu::bindInput(){
@@ -82,7 +83,12 @@ void MiniMenu::Menu::bindInput(){
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
-			if(!Settings.get().RGBenable) LED.setRGB(OFF);
+			if(!Settings.get().RGBenable){
+				LED.setRGB(OFF);
+			}else{
+				LED.setRGB(LEDColor::WHITE);
+				instance->blinkTime = millis();
+			}
 		}else if(instance->selectedElement == 2){
 			instance->stop();
 			ByteBoi.backToLauncher();
@@ -120,7 +126,12 @@ void MiniMenu::Menu::bindInput(){
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
-			if(!Settings.get().RGBenable) LED.setRGB(OFF);
+			if(!Settings.get().RGBenable){
+				LED.setRGB(OFF);
+			}else{
+				LED.setRGB(LEDColor::WHITE);
+				instance->blinkTime = millis();
+			}
 		}
 
 		Playback.tone(500, 100);
@@ -135,7 +146,12 @@ void MiniMenu::Menu::bindInput(){
 		}else if(instance->selectedElement == 1){
 			instance->LEDSwitch->toggle();
 			Settings.get().RGBenable = instance->LEDSwitch->getState();
-			if(!Settings.get().RGBenable) LED.setRGB(OFF);
+			if(!Settings.get().RGBenable){
+				LED.setRGB(OFF);
+			}else{
+				LED.setRGB(LEDColor::WHITE);
+				instance->blinkTime = millis();
+			}
 		}
 
 		Playback.tone(500, 100);
@@ -213,6 +229,10 @@ void MiniMenu::Menu::draw(){
 }
 
 void MiniMenu::Menu::loop(uint micros){
+	if(blinkTime != 0 && millis() - blinkTime >= 200){
+		blinkTime = 0;
+		LED.setRGB(LEDColor::OFF);
+	}
 
 	selectAccum += (float) micros / 1000000.0f;
 	int8_t newX = selectedX + sin(selectAccum * 5.0f) * 3.0f;

@@ -42,12 +42,7 @@ namespace MiniMenu {
 
 		TextElement* texts[3];
 
-		float showProgress = 0;
-		bool shown = false;
-		bool shownDone = false;
-
-		bool exiting = false;
-		bool stopping = false;
+		uint32_t blinkTime = 0;
 
 		float selectAccum = 0;
 		uint8_t selectedX;
