@@ -72,12 +72,14 @@ void BatteryService::begin(){
 	LoopManager::addListener(this);
 	ByteBoi.getExpander()->pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
 	pinMode(BATTERY_PIN, INPUT);
-
-	batteryBuffer[0] = const_cast<Color*>(batteryIcon_0);
-	batteryBuffer[1] = const_cast<Color*>(batteryIcon_1);
-	batteryBuffer[2] = const_cast<Color*>(batteryIcon_2);
-	batteryBuffer[3] = const_cast<Color*>(batteryIcon_3);
-	batteryBuffer[4] = const_cast<Color*>(batteryIcon_4);
+	for(int i = 0; i < 5; i++){
+		batteryBuffer[i] = static_cast<Color*>(malloc(sizeof(String("batteryIcon_" + (String) i))));
+	}
+	memcpy_P(batteryBuffer[0],batteryIcon_0,sizeof(batteryIcon_0));
+	memcpy_P(batteryBuffer[1],batteryIcon_1,sizeof(batteryIcon_1));
+	memcpy_P(batteryBuffer[2],batteryIcon_2,sizeof(batteryIcon_2));
+	memcpy_P(batteryBuffer[3],batteryIcon_3,sizeof(batteryIcon_3));
+	memcpy_P(batteryBuffer[4],batteryIcon_4,sizeof(batteryIcon_4));
 
 }
 
