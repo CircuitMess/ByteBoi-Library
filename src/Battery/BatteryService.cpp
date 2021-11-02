@@ -73,7 +73,7 @@ void BatteryService::begin(){
 	ByteBoi.getExpander()->pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
 	pinMode(BATTERY_PIN, INPUT);
 	for(int i = 0; i < 5; i++){
-		batteryBuffer[i] = static_cast<Color*>(malloc(sizeof(String("batteryIcon_" + (String) i))));
+		batteryBuffer[i] = static_cast<Color*>(malloc(sizeof(batteryIcon_4)));
 	}
 	memcpy_P(batteryBuffer[0],batteryIcon_0,sizeof(batteryIcon_0));
 	memcpy_P(batteryBuffer[1],batteryIcon_1,sizeof(batteryIcon_1));
