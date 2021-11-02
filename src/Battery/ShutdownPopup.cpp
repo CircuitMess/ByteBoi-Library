@@ -13,8 +13,7 @@ ShutdownPopup::ShutdownPopup(Context &context) : Modal(context, 135, 60){
 
 }
 ShutdownPopup::~ShutdownPopup(){
-	buffer = nullptr;
-	delete buffer;
+	free(buffer);
 }
 
 void ShutdownPopup::draw(){
