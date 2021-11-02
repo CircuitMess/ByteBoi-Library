@@ -10,9 +10,13 @@ WarningPopup* WarningPopup::instance = nullptr;
 WarningPopup::WarningPopup(Context &context) : Modal(context, 135, 60){
 	instance = this;
 	screen.getSprite()->setChroma(TFT_TRANSPARENT);
+	buffer= static_cast<Color*>(malloc(sizeof(low)));
+	memcpy_P(buffer,low,sizeof(low));
 }
 
 WarningPopup::~WarningPopup(){
+	buffer = nullptr;
+	delete buffer;
 }
 
 void WarningPopup::draw(){
