@@ -5,6 +5,8 @@
 #include <Audio/SourceWAV.h>
 
 Sample::Sample(fs::File file, bool preload){
+	if(!file) return;
+
 	sourceFile = preload ? RamFile::open(file) : file;
 
 	String fname = file.name();

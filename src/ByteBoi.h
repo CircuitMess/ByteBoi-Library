@@ -13,6 +13,7 @@
 #include "Pins.hpp"
 #include "Menu/Menu.h"
 #include "Playback/PlaybackSystem.h"
+#include "Playback/Sample.h"
 #include "ByteBoiLED.h"
 #include "Settings.h"
 #include "Battery/BatteryService.h"
@@ -30,6 +31,12 @@ public:
 	InputI2C* getInput();
 	static bool inFirmware();
 	static bool isStandalone();
+
+	/**
+	 * Retrieve the path of the game directory on the SD card.
+	 * @return Empty string if the game is standalone.
+	 */
+	String getSDPath();
 
 	/**
 	 * Open resource file. If calling this function from a standalone game, will return the file on SPIFFS located at the specified path.

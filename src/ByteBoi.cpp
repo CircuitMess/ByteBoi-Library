@@ -11,6 +11,8 @@
 #include "Bitmaps/ByteBoiLogo.hpp"
 #include <Loop/LoopManager.h>
 #include <esp_wifi.h>
+#include <esp_bt.h>
+#include <driver/adc.h>
 
 const char* ByteBoiImpl::SPIFFSgameRoot = "/game";
 const char* ByteBoiImpl::SPIFFSdataRoot = "/data";
@@ -72,6 +74,24 @@ void ByteBoiImpl::begin(){
 	Battery.begin();
 	LoopManager::addListener(&Sleep);
 	input->addListener(&Sleep);
+}
+
+String ByteBoiImpl::getSDPath(){
+	if(isStandalone()) return "";
+
+	const char* rootFilePath = "/launcher/gameRoot.path";
+	fs::File rootFile = SPIFFS.open(rootFilePath);
+	if(!rootFile) return "";
+
+	char* root = static_cast<char*>(malloc(rootFile.size() + 1));
+	rootFile.read(reinterpret_cast<uint8_t*>(root), rootFile.size());
+	root[rootFile.size()] = 0;
+	rootFile.close();
+
+	String path(root);
+	free(root);
+
+	return path;
 }
 
 File ByteBoiImpl::openResource(const String& path, const char* mode){
@@ -208,13 +228,17 @@ void ByteBoiImpl::fadeout(){
 
 void ByteBoiImpl::shutdown(){
 	display->getTft()->sleep();
-	expander->pinMode(BL_PIN, 1);
+	expander->pinWrite(BL_PIN, HIGH);
 	LED.setRGB(OFF);
-	esp_wifi_stop();
-	btStop();
 	Playback.stop();
 	delay(100);
 	digitalWrite(SPEAKER_SD, HIGH);
+#ifndef BYTEBOI_LAUNCHER
+	btStop();
+	esp_bt_controller_disable();
+	esp_wifi_stop();
+#endif
+	adc_power_off();
 	esp_deep_sleep_start();
 }
 

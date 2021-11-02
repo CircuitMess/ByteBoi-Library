@@ -37,6 +37,8 @@ void PlaybackSystem::begin(){
 }
 
 void PlaybackSystem::tone(uint16_t freq, uint16_t duration, Wave::Type type){
+	if(Settings.get().volume == 0) return;
+
 	oscillator->tone(freq, duration, type);
 	mixer->resumeChannel(0);
 	start();
@@ -48,8 +50,6 @@ void PlaybackSystem::noTone(){
 
 void PlaybackSystem::audioThread(Task* task){
 	PlaybackSystem* system = static_cast<PlaybackSystem*>(task->arg);
-
-	Serial.println("-- PlaybackSystem started --");
 
 	while(task->running){
 		vTaskDelay(1);
@@ -79,7 +79,6 @@ void PlaybackSystem::audioThread(Task* task){
 		if(system->out->isRunning()){
 			system->out->loop(0);
 		}else{
-			printf("System done\n");
 			break;
 		}
 
@@ -89,6 +88,7 @@ void PlaybackSystem::audioThread(Task* task){
 				sample->getSource()->seek(0, fs::SeekSet);
 			}else{
 				system->mixer->setSource(1, nullptr);
+				system->currentSample = nullptr;
 			}
 		}
 	}
@@ -97,14 +97,13 @@ void PlaybackSystem::audioThread(Task* task){
 }
 
 bool PlaybackSystem::open(Sample* sample){
-	stop();
-
 	this->currentSample = sample;
-
 	return true;
 }
 
 void PlaybackSystem::play(Sample* sample){
+	if(Settings.get().volume == 0) return;
+	if(sample->getSource() == nullptr) return;
 	open(sample);
 	sample->getSource()->seek(0, fs::SeekSet);
 	Sched.loop(0);
@@ -112,6 +111,8 @@ void PlaybackSystem::play(Sample* sample){
 }
 
 void PlaybackSystem::start(){
+	if(Settings.get().volume == 0) return;
+
 	if(currentSample != nullptr){
 		mixer->setSource(1, currentSample->getSource());
 		mixer->resumeChannel(1);
