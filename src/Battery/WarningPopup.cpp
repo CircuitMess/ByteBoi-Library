@@ -15,8 +15,7 @@ WarningPopup::WarningPopup(Context &context) : Modal(context, 135, 60){
 }
 
 WarningPopup::~WarningPopup(){
-	buffer = nullptr;
-	delete buffer;
+	free(buffer);
 }
 
 void WarningPopup::draw(){
