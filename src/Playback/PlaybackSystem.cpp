@@ -103,6 +103,7 @@ bool PlaybackSystem::open(Sample* sample){
 
 void PlaybackSystem::play(Sample* sample){
 	if(Settings.get().volume == 0) return;
+	if(sample->getSource() == nullptr) return;
 	open(sample);
 	sample->getSource()->seek(0, fs::SeekSet);
 	Sched.loop(0);
