@@ -8,8 +8,13 @@ const uint8_t ShutdownPopup::shutdownTime = 5;
 
 ShutdownPopup::ShutdownPopup(Context &context) : Modal(context, 135, 60){
 	screen.getSprite()->setChroma(TFT_TRANSPARENT);
+	buffer= static_cast<Color*>(malloc(sizeof(off)));
+	memcpy(buffer,off,sizeof(off));
+
 }
 ShutdownPopup::~ShutdownPopup(){
+	buffer = nullptr;
+	delete buffer;
 }
 
 void ShutdownPopup::draw(){
@@ -17,7 +22,7 @@ void ShutdownPopup::draw(){
 
 	sprite.clear(TFT_TRANSPARENT);
 	sprite.fillRoundRect(0, 0, 135, 60, 10, TFT_BLACK);
-	sprite.drawIcon(off, 5, 15, 30, 30, 1, TFT_TRANSPARENT);
+	sprite.drawIcon(buffer, 5, 15, 30, 30, 1, TFT_TRANSPARENT);
 
 	sprite.setTextColor(TFT_WHITE);
 	sprite.setTextSize(1);

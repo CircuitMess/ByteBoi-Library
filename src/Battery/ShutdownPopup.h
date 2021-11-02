@@ -16,6 +16,7 @@ public:
 
 	void loop(uint) override;
 private:
+	Color* buffer = nullptr;
 	uint shutdownTimer = 0;
 	static const uint8_t shutdownTime;
 
