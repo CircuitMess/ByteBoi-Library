@@ -33,6 +33,12 @@ public:
 	static bool isStandalone();
 
 	/**
+	 * Retrieve the path of the game directory on the SD card.
+	 * @return Empty string if the game is standalone.
+	 */
+	String getSDPath();
+
+	/**
 	 * Open resource file. If calling this function from a standalone game, will return the file on SPIFFS located at the specified path.
 	 * When a game is started through the launcher, all the resources for the game will be copied to SPIFFS into the /game directory. If
 	 * called in a game started through the launcher, this function will then return the file located at /game<path>. Please note that

@@ -76,6 +76,24 @@ void ByteBoiImpl::begin(){
 	input->addListener(&Sleep);
 }
 
+String ByteBoiImpl::getSDPath(){
+	if(isStandalone()) return "";
+
+	const char* rootFilePath = "/launcher/gameRoot.path";
+	fs::File rootFile = SPIFFS.open(rootFilePath);
+	if(!rootFile) return "";
+
+	char* root = static_cast<char*>(malloc(rootFile.size() + 1));
+	rootFile.read(reinterpret_cast<uint8_t*>(root), rootFile.size());
+	root[rootFile.size()] = 0;
+	rootFile.close();
+
+	String path(root);
+	free(root);
+
+	return path;
+}
+
 File ByteBoiImpl::openResource(const String& path, const char* mode){
 	if(strcmp(esp_ota_get_running_partition()->label, "game") == 0){
 		String result = String(SPIFFSgameRoot + path);
