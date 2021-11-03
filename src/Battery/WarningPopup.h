@@ -22,8 +22,7 @@ private:
 	static const uint8_t warningTime;
 	Modal* prevModal = nullptr;
 	static WarningPopup* instance;
-
-	Color* batteryIconBuffer = nullptr;
+	Color* buffer = nullptr;
 };
 
 
