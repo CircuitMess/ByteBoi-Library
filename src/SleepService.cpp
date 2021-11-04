@@ -33,7 +33,7 @@ void SleepService::begin(){
 
 void SleepService::stop(){
 	autoShutdownMicros = 0;
-	lastShutdownTime = 0;
+	lastShutdownTime = (uint32_t)-1;
 	LoopManager::removeListener(&Sleep);
 	Input::getInstance()->removeListener(&Sleep);
 }
