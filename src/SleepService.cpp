@@ -1,3 +1,4 @@
+#include <Loop/LoopManager.h>
 #include "SleepService.h"
 #include "Settings.h"
 #include "ByteBoi.h"
@@ -7,6 +8,7 @@ SleepService Sleep;
 void SleepService::loop(uint time){
 	if(Settings.get().shutdownTime != 0){
 		autoShutdownMicros += time;
+		Serial.println(autoShutdownMicros);
 		if(autoShutdownMicros >= Settings.get().shutdownTime*1000000*60){
 			ByteBoi.shutdown();
 			return;
@@ -23,4 +25,16 @@ void SleepService::loop(uint time){
 
 void SleepService::anyKeyPressed(){
 	autoShutdownMicros = 0;
+}
+
+void SleepService::begin(InputI2C* input){
+	LoopManager::addListener(&Sleep);
+	input->addListener(&Sleep);
+}
+
+void SleepService::stop(InputI2C* input){
+	autoShutdownMicros = 0;
+	lastShutdownTime = 0;
+	LoopManager::removeListener(&Sleep);
+	input->removeListener(&Sleep);
 }
