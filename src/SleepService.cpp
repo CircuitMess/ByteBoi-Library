@@ -27,14 +27,14 @@ void SleepService::anyKeyPressed(){
 	autoShutdownMicros = 0;
 }
 
-void SleepService::begin(InputI2C* input){
+void SleepService::begin(){
 	LoopManager::addListener(&Sleep);
-	input->addListener(&Sleep);
+	Input::getInstance()->addListener(&Sleep);
 }
 
-void SleepService::stop(InputI2C* input){
+void SleepService::stop(){
 	autoShutdownMicros = 0;
 	lastShutdownTime = 0;
 	LoopManager::removeListener(&Sleep);
-	input->removeListener(&Sleep);
+	Input::getInstance()->removeListener(&Sleep);
 }
