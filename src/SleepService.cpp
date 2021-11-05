@@ -1,3 +1,4 @@
+#include <Loop/LoopManager.h>
 #include "SleepService.h"
 #include "Settings.h"
 #include "ByteBoi.h"
@@ -23,4 +24,16 @@ void SleepService::loop(uint time){
 
 void SleepService::anyKeyPressed(){
 	autoShutdownMicros = 0;
+}
+
+void SleepService::begin(){
+	LoopManager::addListener(this);
+	Input::getInstance()->addListener(this);
+}
+
+void SleepService::stop(){
+	autoShutdownMicros = 0;
+	lastShutdownTime = (uint32_t)-1;
+	LoopManager::removeListener(this);
+	Input::getInstance()->removeListener(this);
 }
