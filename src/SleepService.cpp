@@ -27,13 +27,13 @@ void SleepService::anyKeyPressed(){
 }
 
 void SleepService::begin(){
-	LoopManager::addListener(&Sleep);
-	Input::getInstance()->addListener(&Sleep);
+	LoopManager::addListener(this);
+	Input::getInstance()->addListener(this);
 }
 
 void SleepService::stop(){
 	autoShutdownMicros = 0;
 	lastShutdownTime = (uint32_t)-1;
-	LoopManager::removeListener(&Sleep);
-	Input::getInstance()->removeListener(&Sleep);
+	LoopManager::removeListener(this);
+	Input::getInstance()->removeListener(this);
 }
