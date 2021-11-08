@@ -72,7 +72,6 @@ void ByteBoiImpl::begin(){
 	Context::setDeleteOnPop(true);
 
 	Battery.begin();
-	Sleep.begin();
 }
 
 String ByteBoiImpl::getSDPath(){
