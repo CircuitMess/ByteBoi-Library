@@ -18,6 +18,7 @@
 #include "Settings.h"
 #include "Battery/BatteryService.h"
 #include "Battery/BatteryPopupService.h"
+#include "SleepService.h"
 
 class ByteBoiImpl : public InputListener, public LoopListener{
 public:
