@@ -19,7 +19,7 @@ void BatteryPopupService::loop(uint time){
 
 	checkMicros += time;
 	//voltage not yet read or charging
-	if(Battery.getVoltage() == 0 || Battery.isCharging()){
+	if(Battery.getVoltage() == 0 || Battery.chargePinDetected()){
 		warningShown = false;
 		return;
 	}
