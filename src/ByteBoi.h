@@ -60,6 +60,15 @@ public:
 	File openData(const String& path, const char* mode = "r");
 
 	/**
+	 * Remove data file. Intended for save files, highscores, and other data that should persist reboot. Will delete file on SPIFFS at
+	 * /data/<ID><path>. Use ByteBoi.setGameID to set the ID. If the ID isn't set, this function will return false. Please
+	 * note that SPIFFS file path is limited to 32 characters, including directories and slashes.
+	 * @param path Path of the data file. Make sure to use a leading slash.
+	 * @return True if file exists, false otherwise
+	 */
+	bool removeData(const String& path);
+
+	/**
 	 * Set game ID. Used for ByteBoi.openData. If more than 5 characters are passed, the ID will be truncated to 5 characters. Make sure
 	 * the ID is unique for the game to avoid overwriting save data for another game.
 	 * @param ID Unique identifier for the game.

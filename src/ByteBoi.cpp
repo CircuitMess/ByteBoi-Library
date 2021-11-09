@@ -108,6 +108,13 @@ File ByteBoiImpl::openData(const String& path, const char* mode){
 	return SPIFFS.open(String(SPIFFSdataRoot) + "/" + gameID + path, mode);
 }
 
+bool ByteBoiImpl::removeData(const String& path){
+	if(gameID.length() == 0) return false; //undefined game ID
+	String spiffsPath = String(SPIFFSdataRoot) + "/" + gameID + path;
+	if(!SPIFFS.exists(spiffsPath)) return false;
+	return SPIFFS.remove(spiffsPath);
+}
+
 bool ByteBoiImpl::inFirmware(){
 	return (strcmp(esp_ota_get_running_partition()->label, "launcher") == 0); //already in launcher partition
 }
