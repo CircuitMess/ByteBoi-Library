@@ -21,10 +21,11 @@ void BatteryService::loop(uint micros){
 			voltage = (1.1 * measureSum + 683);
 			measureCounter = 0;
 			measureSum = 0;
-		}
-		if(getLevel() == 0 && !shutdownDisable && !isCharging()){
-			ByteBoi.shutdown();
-			return;
+
+			if(getLevel() == 0 && !shutdownDisable && !chargePinDetected()){
+				ByteBoi.shutdown();
+				return;
+			}
 		}
 		measureMicros = 0;
 	}
@@ -46,7 +47,7 @@ uint8_t BatteryService::getLevel() const{
 }
 
 uint16_t BatteryService::getVoltage() const{
-	if(ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN)){
+	if(chargePinDetected()){
 		return ((float)voltage - (2289.61 - 0.523723*(float)voltage));
 	}else{
 		return voltage;
@@ -80,7 +81,10 @@ void BatteryService::begin(){
 	memcpy_P(batteryBuffer[2],batteryIcon_2,sizeof(batteryIcon_2));
 	memcpy_P(batteryBuffer[3],batteryIcon_3,sizeof(batteryIcon_3));
 	memcpy_P(batteryBuffer[4],batteryIcon_4,sizeof(batteryIcon_4));
+}
 
+bool BatteryService::chargePinDetected() const{
+	ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN);
 }
 
 bool BatteryService::isCharging() const{

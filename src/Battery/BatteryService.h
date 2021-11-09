@@ -18,6 +18,7 @@ public:
 	uint8_t getPercentage() const;
 	void disableShutdown(bool _shutdown);
 	bool isCharging() const;
+	bool chargePinDetected() const;
 
 	void drawIcon(Sprite& sprite, int16_t x, int16_t y, int16_t level = -1);
 
