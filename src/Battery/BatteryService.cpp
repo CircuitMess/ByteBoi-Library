@@ -8,16 +8,17 @@
 #include <SPIFFS.h>
 #include <Loop/LoopManager.h>
 
-const uint16_t BatteryService::measureInterval = 1; //in seconds
+const uint16_t BatteryService::measureInterval = 2; //in seconds
+const uint16_t BatteryService::measureCount = 10; //in seconds
 
 void BatteryService::loop(uint micros){
 	measureMicros += micros;
-	if(measureMicros >= measureInterval * 200000){
+	if(measureMicros >= (measureInterval * 1000000) / measureCount){
 		measureMicros = 0;
 		measureSum += analogRead(BATTERY_PIN);
 		measureCounter++;
-		if(measureCounter == 5){
-			measureSum = measureSum / 5;
+		if(measureCounter == measureCount){
+			measureSum = measureSum / measureCount;
 			voltage = (1.1 * measureSum + 683);
 			measureCounter = 0;
 			measureSum = 0;

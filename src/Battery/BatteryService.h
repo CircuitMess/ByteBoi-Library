@@ -25,7 +25,8 @@ public:
 private:
 	uint16_t voltage = 0; //in mV
 	static const uint16_t measureInterval;
-	uint measureMicros = measureInterval*1000000;
+	static const uint16_t measureCount;
+	uint measureMicros = 0;
 	bool shutdownDisable = false;
 	uint8_t level = 0;
 	Color* batteryBuffer[6] = {nullptr};
