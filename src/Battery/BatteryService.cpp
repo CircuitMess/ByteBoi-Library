@@ -87,11 +87,17 @@ bool BatteryService::isCharging() const{
 	if(getLevel() == 4){
 		return false;
 	}else{
-		return (ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN));
+		return chargePinDetected();
 	}
 }
 
-void BatteryService::drawIcon(Sprite &sprite, int16_t x, int16_t y){
+void BatteryService::drawIcon(Sprite &sprite, int16_t x, int16_t y, int16_t level){
+	if(level != -1){
+		if(level > 4 || level < 0) return;
+		sprite.drawIcon(batteryBuffer[level], x, y, 14, 6, 1, TFT_TRANSPARENT);
+		return;
+	}
+
 	Color* buffer = batteryBuffer[getLevel()];
 	if(buffer == nullptr) return;
 	if(!isCharging() && timePassed != 0){

@@ -19,7 +19,7 @@ public:
 	void disableShutdown(bool _shutdown);
 	bool isCharging() const;
 
-	void drawIcon(Sprite& sprite, int16_t x, int16_t y);
+	void drawIcon(Sprite& sprite, int16_t x, int16_t y, int16_t level = -1);
 
 private:
 	uint16_t voltage = 0; //in mV
