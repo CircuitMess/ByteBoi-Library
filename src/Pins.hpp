@@ -29,7 +29,7 @@
 
 #define I2C_SDA 23
 #define I2C_SCL 22
-#define I2C_ADDR 0x74
+#define I2C_EXPANDER_ADDR 0x74
 
 
 #endif //BYTEBOI_LIBRARY_PINS_HPP

@@ -58,7 +58,7 @@ void ByteBoiImpl::begin(){
 	display->getBaseSprite()->clear(TFT_BLACK);
 	display->commit();
 
-	expander->begin(I2C_ADDR, I2C_SDA, I2C_SCL);
+	expander->begin(I2C_EXPANDER_ADDR, I2C_SDA, I2C_SCL);
 	expander->pinMode(BL_PIN, OUTPUT);
 	expander->pinWrite(BL_PIN, 0);
 	LED.begin();
