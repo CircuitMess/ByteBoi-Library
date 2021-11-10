@@ -85,7 +85,7 @@ void BatteryService::begin(){
 }
 
 bool BatteryService::chargePinDetected() const{
-	ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN);
+	return ByteBoi.getExpander()->getPortState() & (1 << CHARGE_DETECT_PIN);
 }
 
 bool BatteryService::isCharging() const{
