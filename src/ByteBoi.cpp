@@ -64,6 +64,7 @@ void ByteBoiImpl::begin(){
 	LED.begin();
 	LED.setRGB(OFF);
 	expander->pinMode(SD_DETECT_PIN, INPUT);
+	expander->portRead();
 
 	input = new InputI2C(expander);
 	input->preregisterButtons({ BTN_A, BTN_B, BTN_C, BTN_UP, BTN_DOWN, BTN_RIGHT, BTN_LEFT });
