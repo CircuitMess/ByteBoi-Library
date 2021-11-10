@@ -27,5 +27,9 @@
 #define SPI_SS -1
 #define SD_CS 2
 
+#define I2C_SDA 23
+#define I2C_SCL 22
+#define I2C_ADDR 0x74
+
 
 #endif //BYTEBOI_LIBRARY_PINS_HPP
