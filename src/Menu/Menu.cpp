@@ -91,6 +91,7 @@ void MiniMenu::Menu::bindInput(){
 			}
 		}else if(instance->selectedElement == 2){
 			instance->stop();
+			Playback.stop();
 			ByteBoi.backToLauncher();
 		}
 		Playback.tone(500, 100);
