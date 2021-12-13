@@ -30,6 +30,11 @@ void ByteBoiImpl::begin(){
 	delay(10);
 	dacWrite(SPEAKER_PIN, 127);
 
+	uint64_t mac = ESP.getEfuseMac();
+	uint32_t upper = mac >> 32;
+	uint32_t lower = mac & 0xffffffff;
+	Serial.printf("ByteBoi:v1.0:%x%x\n", upper, lower);
+
 	if(!inFirmware()){
 		esp_ota_set_boot_partition(esp_ota_get_next_update_partition(esp_ota_get_running_partition()));
 	}
