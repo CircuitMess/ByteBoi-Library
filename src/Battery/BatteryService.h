@@ -16,7 +16,7 @@ public:
 	uint16_t getVoltage() const;
 	uint8_t getLevel() const;
 	uint8_t getPercentage() const;
-	void disableShutdown(bool _shutdown);
+	void setAutoShutdown(bool enabled);
 	bool isCharging() const;
 	bool chargePinDetected() const;
 
@@ -27,7 +27,7 @@ private:
 	static const uint16_t measureInterval;
 	static const uint16_t measureCount;
 	uint measureMicros = 0;
-	bool shutdownDisable = false;
+	bool autoShutdown = false;
 	uint8_t level = 0;
 	Color* batteryBuffer[6] = {nullptr};
 	uint32_t timePassed = 0;

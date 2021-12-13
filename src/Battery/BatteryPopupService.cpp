@@ -72,7 +72,7 @@ void BatteryPopupService::loop(uint time){
 
 void BatteryPopupService::enablePopups(bool enable){
 	if(enable){
-		Battery.disableShutdown(true);
+		Battery.setAutoShutdown(false);
 	}
 
 	if(enable && !enabled){

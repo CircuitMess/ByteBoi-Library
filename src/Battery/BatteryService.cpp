@@ -23,7 +23,7 @@ void BatteryService::loop(uint micros){
 			measureCounter = 0;
 			measureSum = 0;
 
-			if(getLevel() == 0 && !shutdownDisable && !chargePinDetected()){
+			if(getLevel() == 0 && autoShutdown && !chargePinDetected()){
 				ByteBoi.shutdown();
 				return;
 			}
@@ -66,8 +66,8 @@ uint8_t BatteryService::getPercentage() const{
 	}
 }
 
-void BatteryService::disableShutdown(bool _shutdown){
-	shutdownDisable = _shutdown;
+void BatteryService::setAutoShutdown(bool enabled){
+	autoShutdown = enabled;
 }
 
 void BatteryService::begin(){
