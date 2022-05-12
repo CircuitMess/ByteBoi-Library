@@ -49,7 +49,6 @@ public:
 
 	void seek(uint16_t time);
 
-	void disableScheduler(bool schedDisabled);
 	void updateGain();
 
 private:

@@ -12,13 +12,13 @@ Sample::Sample(fs::File file, bool preload){
 	String fname = file.name();
 	fname.toLowerCase();
 
-	if(fname.endsWith(".aac") || fname.endsWith(".m4a")){
-		source = new SourceAAC(sourceFile);
-	}else{
-		source = new SourceWAV(sourceFile);
-	}
+	dataSource = new FileDataSource(sourceFile);
 
-	Sched.loop(0);
+	if(fname.endsWith(".aac") || fname.endsWith(".m4a")){
+		source = new SourceAAC(*dataSource);
+	}else{
+		source = new SourceWAV(*dataSource);
+	}
 
 	if(preload){
 		file.close();
@@ -28,6 +28,7 @@ Sample::Sample(fs::File file, bool preload){
 Sample::~Sample(){
 	sourceFile.close();
 	delete source;
+	delete dataSource;
 }
 
 Source* Sample::getSource() const{
