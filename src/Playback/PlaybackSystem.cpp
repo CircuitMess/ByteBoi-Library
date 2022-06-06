@@ -82,6 +82,7 @@ void PlaybackSystem::audioThread(Task* task){
 		if(sample != nullptr && sample->getSource()->available() == 0){
 			if(sample->isLooping()){
 				sample->getSource()->seek(0, fs::SeekSet);
+				system->out->start();
 			}else{
 				system->mixer->setSource(1, nullptr);
 				system->currentSample = nullptr;
