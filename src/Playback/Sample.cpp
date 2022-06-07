@@ -13,12 +13,15 @@ Sample::Sample(fs::File file, bool preload){
 	fname.toLowerCase();
 
 	dataSource = new FileDataSource(sourceFile);
+	schedDataSource = new ScheduledDataSource(Playback.getSched(), *dataSource);
 
 	if(fname.endsWith(".aac") || fname.endsWith(".m4a")){
-		source = new SourceAAC(*dataSource);
+		source = new SourceAAC(*schedDataSource);
 	}else{
-		source = new SourceWAV(*dataSource);
+		source = new SourceWAV(*schedDataSource);
 	}
+
+	Playback.getSched().loop(0);
 
 	if(preload){
 		file.close();
@@ -29,6 +32,7 @@ Sample::~Sample(){
 	sourceFile.close();
 	delete source;
 	delete dataSource;
+	delete schedDataSource;
 }
 
 Source* Sample::getSource() const{

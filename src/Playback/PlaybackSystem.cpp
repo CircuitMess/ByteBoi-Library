@@ -70,6 +70,8 @@ void PlaybackSystem::audioThread(Task* task){
 
 		if(!task->running) break;
 
+		system->Sched.loop(0);
+
 		system->setMixRatio();
 
 		if(system->out->isRunning()){
@@ -102,7 +104,6 @@ void PlaybackSystem::play(Sample* sample){
 	if(Settings.get().volume == 0) return;
 	if(sample->getSource() == nullptr) return;
 	open(sample);
-	sample->getSource()->seek(0, fs::SeekSet);
 	start();
 }
 
@@ -177,4 +178,8 @@ void PlaybackSystem::updateGain(){
 	if(!out) return;
 
 	out->setGain((float) Settings.get().volume / 255.0f);
+}
+
+SDScheduler& PlaybackSystem::getSched(){
+	return Sched;
 }
