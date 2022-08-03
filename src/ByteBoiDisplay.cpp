@@ -62,8 +62,8 @@ lgfx::Panel_ST7789* ByteBoiDisplay::panel2() const{
 
 		cfg.spi_host = HSPI_HOST;
 		cfg.spi_mode = 3;
-		cfg.freq_write = 27000000;
-		cfg.freq_read = 27000000;
+		cfg.freq_write = 60000000;
+		cfg.freq_read = 60000000;
 		cfg.spi_3wire = false;
 		cfg.use_lock = true;
 		cfg.dma_channel = 1;
