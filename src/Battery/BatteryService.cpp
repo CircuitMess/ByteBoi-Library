@@ -7,9 +7,7 @@
 #include "../Bitmaps/battery_4.hpp"
 #include <SPIFFS.h>
 #include <Loop/LoopManager.h>
-
-const uint16_t BatteryService::measureInterval = 2; //in seconds
-const uint16_t BatteryService::measureCount = 10; //in seconds
+#include <Util/HWRevision.h>
 
 void BatteryService::loop(uint micros){
 	measureMicros += micros;
@@ -18,13 +16,7 @@ void BatteryService::loop(uint micros){
 		measureSum += analogRead(BATTERY_PIN);
 		measureCounter++;
 		if(measureCounter == measureCount){
-			measureSum = measureSum / measureCount;
-
-			if(ByteBoi.getExpander()){
-				voltage = (1.1 * measureSum + 683);
-			}else{
-				voltage = (0.587 * measureSum + 1694.0);
-			}
+			voltage = (int) std::round(measureSum / measureCount);
 
 			measureCounter = 0;
 			measureSum = 0;
@@ -55,9 +47,15 @@ uint8_t BatteryService::getLevel() const{
 
 uint16_t BatteryService::getVoltage() const{
 	if(chargePinDetected()){
-		return ((float)voltage - (2289.61 - 0.523723*(float)voltage));
-	}else{
-		return voltage;
+		return 5000;
+	}
+
+	if(ByteBoi.getVer() == ByteBoiImpl::v2_0){
+		return (int) std::round(0.945 * voltage + 532);
+	}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){
+		return (int) std::round(0.587 * voltage + 1694.0);
+	}else{ // v1.0
+		return (int) std::round(1.1 * voltage + 683);
 	}
 }
 
@@ -86,15 +84,6 @@ void BatteryService::setAutoShutdown(bool enabled){
 void BatteryService::begin(){
 	LoopManager::addListener(this);
 
-	auto expander = ByteBoi.getExpander();
-	if(expander){
-		expander->pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
-	}else{
-		analogSetAttenuation(ADC_11db);
-		pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
-	}
-
-
 	pinMode(BATTERY_PIN, INPUT);
 	for(int i = 0; i < 5; i++){
 		batteryBuffer[i] = static_cast<Color*>(malloc(sizeof(batteryIcon_4)));
@@ -104,6 +93,30 @@ void BatteryService::begin(){
 	memcpy_P(batteryBuffer[2],batteryIcon_2,sizeof(batteryIcon_2));
 	memcpy_P(batteryBuffer[3],batteryIcon_3,sizeof(batteryIcon_3));
 	memcpy_P(batteryBuffer[4],batteryIcon_4,sizeof(batteryIcon_4));
+
+	if(ByteBoi.getVer() == ByteBoiImpl::Ver::v1_0){
+		ByteBoi.getExpander()->pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
+	}else if(ByteBoi.getVer() == ByteBoiImpl::Ver::v1_1 || ByteBoi.getVer() == ByteBoiImpl::Ver::v2_0){
+		pinMode(CHARGE_DETECT_PIN, INPUT_PULLDOWN);
+
+		if(ByteBoi.getVer() == ByteBoiImpl::Ver::v2_0){
+			// TODO: Check if this stays low during deep sleep
+			pinMode(CALIB_EN, OUTPUT);
+			digitalWrite(CALIB_EN, 0);
+
+			analogSetAttenuation(ADC_0db);
+
+			// calibrate(); // TODO: GPIO35 is input-only
+		}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){
+			analogSetAttenuation(ADC_11db);
+		}
+	}
+
+	for(int i = 0; i < measureCount; i++){
+		measureSum += analogRead(BATTERY_PIN);
+	}
+	voltage = (int) std::round(measureSum / measureCount);
+	measureSum = 0;
 }
 
 bool BatteryService::chargePinDetected() const{
@@ -116,11 +129,7 @@ bool BatteryService::chargePinDetected() const{
 }
 
 bool BatteryService::isCharging() const{
-	if(getLevel() == 4){
-		return false;
-	}else{
-		return chargePinDetected();
-	}
+	return chargePinDetected();
 }
 
 void BatteryService::drawIcon(Sprite &sprite, int16_t x, int16_t y, int16_t level){
@@ -151,4 +160,20 @@ void BatteryService::drawIcon(Sprite &sprite, int16_t x, int16_t y, int16_t leve
 	}else{
 		sprite.drawIcon(buffer, x, y, 14, 6, 1, TFT_TRANSPARENT);
 	}
+}
+
+void BatteryService::calibrate(){
+	digitalWrite(CALIB_EN, 1);
+	delay(100);
+
+	float sum = 0;
+	for(int i = 0; i < measureCount; i++){
+		sum += analogRead(BATTERY_PIN);
+		delay(100 / measureCount);
+	}
+	const uint16_t volt = std::round(sum / (float) measureCount);
+
+	calibOffset = CalibRef - volt;
+
+	digitalWrite(CALIB_EN, 0);
 }

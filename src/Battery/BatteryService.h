@@ -9,8 +9,6 @@
 
 class BatteryService : public LoopListener{
 public:
-	BatteryService()= default;
-
 	void begin();
 	void loop(uint micros) override;
 	uint16_t getVoltage() const;
@@ -24,8 +22,8 @@ public:
 
 private:
 	uint16_t voltage = 0; //in mV
-	static const uint16_t measureInterval;
-	static const uint16_t measureCount;
+	static constexpr uint16_t measureInterval = 2;
+	static constexpr uint16_t measureCount = 10;
 	uint measureMicros = 0;
 	bool autoShutdown = false;
 	uint8_t level = 0;
@@ -34,6 +32,10 @@ private:
 	uint8_t pictureIndex = 0;
 	float measureSum = 0;
 	uint8_t measureCounter = 0;
+
+	static constexpr uint16_t CalibRef = 624;
+	int16_t calibOffset = 0;
+	void calibrate();
 };
 
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H

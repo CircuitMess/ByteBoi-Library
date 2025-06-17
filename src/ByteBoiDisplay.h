@@ -13,6 +13,7 @@ public:
 
 	lgfx::Panel_ILI9341* panel1() const;
 	lgfx::Panel_ST7789* panel2() const;
+	lgfx::Panel_ST7789* panel3() const;
 
 };
 
