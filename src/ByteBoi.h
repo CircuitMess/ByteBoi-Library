@@ -29,7 +29,7 @@ public:
 	 * Initializes display, Playback, Battery, I2C expander, I2C input, and pre-registers all buttons.
 	 */
 	void begin();
-	void initVer(); // Initializes version and pins; also called from begin()
+	void initVer(int override = -1); // Initializes version and pins; also called from begin()
 
 	Display* getDisplay();
 	I2cExpander* getExpander();
@@ -115,6 +115,7 @@ private:
 	bool sdInserted = false;
 
 	Ver ver = v1_0;
+	bool verInited = false;
 };
 
 extern ByteBoiImpl ByteBoi;

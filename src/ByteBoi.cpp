@@ -118,8 +118,13 @@ void ByteBoiImpl::begin(){
 	setBacklight(true);
 }
 
-void ByteBoiImpl::initVer(){
-	if(HWRevision::get() == 1){
+void ByteBoiImpl::initVer(int override){
+	if(verInited) return;
+	verInited = true;
+
+	const auto hw = override == -1 ? HWRevision::get() : override;
+
+	if(hw == 1){
 		// HW v2
 		ver = v2_0;
 		Pins.set(Pins3);
