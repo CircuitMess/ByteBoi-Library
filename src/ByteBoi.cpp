@@ -99,11 +99,11 @@ void ByteBoiImpl::begin(){
 
 	display = new Display(160, 120, -1, 1);
 	if(ver == v1_0){
-		display->getTft()->setPanel(displayConfig.panel1());
+		display->getTft()->setPanel(ByteBoiDisplay::panel1());
 	}else if(ver == v1_1){
-		display->getTft()->setPanel(displayConfig.panel2());
+		display->getTft()->setPanel(ByteBoiDisplay::panel2());
 	}else{
-		display->getTft()->setPanel(displayConfig.panel3());
+		display->getTft()->setPanel(ByteBoiDisplay::panel3());
 	}
 
 	display->begin();

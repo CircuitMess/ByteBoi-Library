@@ -112,8 +112,6 @@ private:
 	void (* splashCallback)() = nullptr;
 	uint32_t splashTime = 0;
 
-	ByteBoiDisplay displayConfig;
-
 	bool sdInserted = false;
 
 	Ver ver = v1_0;

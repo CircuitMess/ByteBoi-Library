@@ -10,10 +10,9 @@
 
 class ByteBoiDisplay : public lgfx::LGFX_Device {
 public:
-
-	lgfx::Panel_ILI9341* panel1() const;
-	lgfx::Panel_ST7789* panel2() const;
-	lgfx::Panel_ST7789* panel3() const;
+	static lgfx::Panel_ILI9341* panel1();
+	static lgfx::Panel_ST7789* panel2();
+	static lgfx::Panel_ST7789* panel3();
 
 };
 

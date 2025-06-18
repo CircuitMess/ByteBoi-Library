@@ -1,7 +1,7 @@
 #include "ByteBoiDisplay.h"
 #include "ByteBoi.h"
 
-lgfx::Panel_ILI9341* ByteBoiDisplay::panel1() const{
+lgfx::Panel_ILI9341* ByteBoiDisplay::panel1(){
 	auto bus = new lgfx::Bus_SPI();
 	auto panel = new lgfx::Panel_ILI9341();
 
@@ -50,7 +50,7 @@ lgfx::Panel_ILI9341* ByteBoiDisplay::panel1() const{
 	return panel;
 }
 
-lgfx::Panel_ST7789* ByteBoiDisplay::panel2() const{
+lgfx::Panel_ST7789* ByteBoiDisplay::panel2(){
 	auto bus = new lgfx::Bus_SPI();
 	auto panel = new lgfx::Panel_ST7789();
 
@@ -99,7 +99,7 @@ lgfx::Panel_ST7789* ByteBoiDisplay::panel2() const{
 	return panel;
 }
 
-lgfx::Panel_ST7789* ByteBoiDisplay::panel3() const{
+lgfx::Panel_ST7789* ByteBoiDisplay::panel3(){
 	auto bus = new lgfx::Bus_SPI();
 	auto panel = new lgfx::Panel_ST7789();
 
