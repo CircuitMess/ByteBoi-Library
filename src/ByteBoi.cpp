@@ -80,6 +80,19 @@ void ByteBoiImpl::begin(){
 		Serial.println("SPIFFS error");
 	}
 
+	display = new Display(160, 120, -1, 1);
+	if(ver == v1_0){
+		display->getTft()->setPanel(ByteBoiDisplay::panel1());
+	}else if(ver == v1_1){
+		display->getTft()->setPanel(ByteBoiDisplay::panel2());
+	}else{
+		display->getTft()->setPanel(ByteBoiDisplay::panel3());
+	}
+
+	display->begin();
+	display->getBaseSprite()->clear(TFT_BLACK);
+	display->commit();
+
 	Battery.begin();
 	if(Battery.getLevel() == 0 && !Battery.isCharging()){
 		ByteBoi.shutdown();
@@ -96,19 +109,6 @@ void ByteBoiImpl::begin(){
 	SPI.setFrequency(60000000);
 
 	checkSD();
-
-	display = new Display(160, 120, -1, 1);
-	if(ver == v1_0){
-		display->getTft()->setPanel(ByteBoiDisplay::panel1());
-	}else if(ver == v1_1){
-		display->getTft()->setPanel(ByteBoiDisplay::panel2());
-	}else{
-		display->getTft()->setPanel(ByteBoiDisplay::panel3());
-	}
-
-	display->begin();
-	display->getBaseSprite()->clear(TFT_BLACK);
-	display->commit();
 
 	input->preregisterButtons({ (uint8_t) BTN_A, (uint8_t) BTN_B, (uint8_t) BTN_C, (uint8_t) BTN_UP, (uint8_t) BTN_DOWN, (uint8_t) BTN_RIGHT, (uint8_t) BTN_LEFT });
 	LoopManager::addListener(input);
