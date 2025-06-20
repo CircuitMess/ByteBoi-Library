@@ -45,12 +45,19 @@ uint8_t BatteryService::getLevel() const{
 	}
 }
 
-uint16_t BatteryService::getVoltage() const{
-	if(chargePinDetected()){
+uint16_t BatteryService::getVoltage(bool bypassChrg) const{
+	if(chargePinDetected() && !bypassChrg){
 		return 5000;
 	}
 
 	if(ByteBoi.getVer() == ByteBoiImpl::v2_0){
+		if(hasChars){
+			const auto volt = esp_adc_cal_raw_to_voltage(voltage, &calChars);
+			return (int) std::round(4.7769 * volt - 617.0);
+		}else{
+			return (int) std::round(1.0683 * voltage - 197.0);
+		}
+
 		return (int) std::round(0.945 * voltage + 532);
 	}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){
 		return (int) std::round(0.587 * voltage + 1694.0);
@@ -62,10 +69,12 @@ uint16_t BatteryService::getVoltage() const{
 uint8_t BatteryService::getPercentage() const{
 	int16_t percentage;
 
-	if(ByteBoi.getExpander()){
-		percentage = map(getVoltage(), 3650, 4250, 0, 100);
-	}else{
+	if(ByteBoi.getVer() == ByteBoiImpl::v2_0){
+		percentage = map(getVoltage(), 3650, 4100, 0, 100);
+	}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){
 		percentage = map(getVoltage(), 3650, 4000, 0, 100);
+	}else{
+		percentage = map(getVoltage(), 3650, 4250, 0, 100);
 	}
 
 	if(percentage < 0){
@@ -105,6 +114,12 @@ void BatteryService::begin(){
 			digitalWrite(CALIB_EN, 0);
 
 			analogSetAttenuation(ADC_0db);
+
+			if(esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK || esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK){
+				if(esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_0, ADC_WIDTH_BIT_12, 0, &calChars) == ESP_OK){
+					hasChars = true;
+				}
+			}
 
 			// calibrate(); // TODO: GPIO35 is input-only
 		}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){

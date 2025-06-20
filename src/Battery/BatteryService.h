@@ -6,12 +6,13 @@
 #include <Wire.h>
 #include <Display/Sprite.h>
 #include <Input/InputListener.h>
+#include <esp_adc_cal.h>
 
 class BatteryService : public LoopListener{
 public:
 	void begin();
 	void loop(uint micros) override;
-	uint16_t getVoltage() const;
+	uint16_t getVoltage(bool bypassChrg = false) const;
 	uint8_t getLevel() const;
 	uint8_t getPercentage() const;
 	void setAutoShutdown(bool enabled);
@@ -36,6 +37,9 @@ private:
 	static constexpr uint16_t CalibRef = 624;
 	int16_t calibOffset = 0;
 	void calibrate();
+
+	esp_adc_cal_characteristics_t calChars;
+	bool hasChars = false;
 };
 
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H
