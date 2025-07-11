@@ -99,5 +99,6 @@ const PinDefMap<Pin> Pins3 = {
 		{ Pin::ShiftSda,  4 },
 		{ Pin::ShiftPl,   0 },
 
+		//NOTE: Design error on HW v2.3, GPIO35 is input-only and cannot be used here
 		{ Pin::RefEn,     35 }
 };

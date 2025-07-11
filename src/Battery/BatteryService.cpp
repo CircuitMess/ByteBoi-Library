@@ -13,7 +13,12 @@ void BatteryService::loop(uint micros){
 	measureMicros += micros;
 	if(measureMicros >= (measureInterval * 1000000) / measureCount){
 		measureMicros = 0;
-		measureSum += analogRead(BATTERY_PIN);
+
+		if(hasChars){
+			measureSum += esp_adc_cal_raw_to_voltage(analogRead(BATTERY_PIN), &calChars) * Factor;
+		}else{
+			measureSum += analogRead(BATTERY_PIN);
+		}
 		measureCounter++;
 		if(measureCounter == measureCount){
 			voltage = (int) std::round(measureSum / measureCount);
@@ -52,13 +57,10 @@ uint16_t BatteryService::getVoltage(bool bypassChrg) const{
 
 	if(ByteBoi.getVer() == ByteBoiImpl::v2_0){
 		if(hasChars){
-			const auto volt = esp_adc_cal_raw_to_voltage(voltage, &calChars);
-			return (int) std::round(4.7769 * volt - 617.0);
+			return voltage;
 		}else{
 			return (int) std::round(1.0683 * voltage - 197.0);
 		}
-
-		return (int) std::round(0.945 * voltage + 532);
 	}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){
 		return (int) std::round(0.587 * voltage + 1694.0);
 	}else{ // v1.0
@@ -113,22 +115,31 @@ void BatteryService::begin(){
 			pinMode(CALIB_EN, OUTPUT);
 			digitalWrite(CALIB_EN, 0);
 
-			analogSetAttenuation(ADC_0db);
+			analogSetAttenuation(ADC_2_5db);
 
 			if(esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK || esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK){
-				if(esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_0, ADC_WIDTH_BIT_12, 0, &calChars) == ESP_OK){
+				if(esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 0, &calChars) == ESP_OK){
 					hasChars = true;
 				}
 			}
 
-			// calibrate(); // TODO: GPIO35 is input-only
+			if(!hasChars){
+				printf("No ADC calib in efuse found!\n");
+			}
+
+			//NOTE: Design error on HW v2.3, GPIO35 is input-only and cannot be used here
+			// calibrate();
 		}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){
 			analogSetAttenuation(ADC_11db);
 		}
 	}
 
 	for(int i = 0; i < measureCount; i++){
-		measureSum += analogRead(BATTERY_PIN);
+		if(hasChars){
+			measureSum += esp_adc_cal_raw_to_voltage(analogRead(BATTERY_PIN), &calChars) * Factor;
+		}else{
+			measureSum += analogRead(BATTERY_PIN);
+		}
 	}
 	voltage = (int) std::round(measureSum / measureCount);
 	measureSum = 0;

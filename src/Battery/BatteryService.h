@@ -34,12 +34,18 @@ private:
 	float measureSum = 0;
 	uint8_t measureCounter = 0;
 
+	/**
+	 * UNUSED - calibrate
+	 * Design error on HW v2.3, GPIO35 is input-only and cannot be used here
+	 */
+	void calibrate();
 	static constexpr uint16_t CalibRef = 624;
 	int16_t calibOffset = 0;
-	void calibrate();
 
 	esp_adc_cal_characteristics_t calChars;
 	bool hasChars = false;
+	//Voltage divider factor on HW v2.X
+	static constexpr uint8_t Factor = 4;
 };
 
 #endif //BYTEBOI_LIBRARY_BATTERYSERVICE_H
