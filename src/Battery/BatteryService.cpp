@@ -118,7 +118,7 @@ void BatteryService::begin(){
 			analogSetAttenuation(ADC_2_5db);
 
 			if(esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK || esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK){
-				if(esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 0, &calChars) == ESP_OK){
+				if(esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_2_5, ADC_WIDTH_BIT_12, 0, &calChars) != ESP_ADC_CAL_VAL_DEFAULT_VREF){
 					hasChars = true;
 				}
 			}
