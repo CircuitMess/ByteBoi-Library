@@ -33,10 +33,9 @@ private:
 	Sprite* canvas;
 	Context* currentContext = nullptr;
 
-	LinearLayout* layout;
 	TextElement* exit = nullptr;
-	Switch* LEDSwitch;
-	SliderElement* volumeSlider;
+	Switch* LEDSwitch = nullptr;
+	SliderElement* volumeSlider = nullptr;
 
 	std::array<SettingsElement*, 3> elements;
 	int NumElements = 3;

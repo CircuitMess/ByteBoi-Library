@@ -12,9 +12,7 @@ MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, Byte
 
 	instance = this;
 
-	layout = new LinearLayout(&screen, VERTICAL);
-
-	volumeSlider = new SliderElement(layout, "Volume", [](int value){
+	volumeSlider = new SliderElement(&screen, "Volume", [](int value){
 		Settings.get().volume = value;
 		Playback.updateGain();
 	});
@@ -26,7 +24,7 @@ MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, Byte
 		LEDSwitch = nullptr;
 		NumElements = 1;
 	}else{
-		LEDSwitch = new Switch(layout, "LEDs", [](int value){
+		LEDSwitch = new Switch(&screen, "LEDs", [](int value){
 			Settings.get().RGBenable = value;
 			if(!value){
 				LED.setRGB(OFF);
@@ -44,7 +42,7 @@ MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, Byte
 
 	// TODO: rework this check, exit should appear if this is the game partition
 	if(!ByteBoi.isStandalone()){
-		exit = new TextElement(layout, "Exit game", [](int value){
+		exit = new TextElement(&screen, "Exit game", [](int value){
 			instance->stop();
 			Playback.stop();
 			ByteBoi.backToLauncher();
@@ -59,7 +57,9 @@ MiniMenu::Menu::Menu(Context* currentContext) : Modal(*currentContext, 130, Byte
 }
 
 MiniMenu::Menu::~Menu(){
-
+	for(uint8_t i = 0; i < NumElements; i++){
+		delete elements[i];
+	}
 }
 
 void MiniMenu::Menu::start(){
@@ -188,31 +188,15 @@ void MiniMenu::Menu::releaseInput(){
 	Input::getInstance()->removeButtonHeldRepeatCallback(BTN_RIGHT);
 }
 
-/*
-void MiniMenu::Menu::selectElement(uint8_t index){
-	layout->reposChildren();
-	RGBEnableLayout->reposChildren();
-	volumeLayout->reposChildren();
-	selectedElement = index;
-	selectAccum = 0;
-
-	ledText->setColor(TFT_WHITE);
-	volumeText->setColor(TFT_WHITE);
-
-	if(exit){
-		exit->setColor(TFT_WHITE);
-	}
-
-	texts[index]->setColor(TFT_YELLOW);
-	selectedX = texts[index]->getX();
-}
-*/
-
 void MiniMenu::Menu::draw(){
 	canvas->clear(TFT_TRANSPARENT);
 	canvas->fillRoundRect(screen.getTotalX(), screen.getTotalY(), canvas->width(), canvas->height(), 3, C_HEX(0x004194));
 	canvas->fillRoundRect(screen.getTotalX() + 2, screen.getTotalY() + 2, canvas->width() - 4, canvas->height() - 4, 3, C_HEX(0x0041ff));
 	Battery.drawIcon(*canvas, 111, 4);
+
+	for(uint8_t i = 0; i < NumElements; i++){
+		elements[i]->draw();
+	}
 	screen.draw();
 }
 
@@ -229,16 +213,19 @@ void MiniMenu::Menu::loop(uint micros){
 }
 
 void MiniMenu::Menu::buildUI(){
-	layout->setWHType(PARENT, CHILDREN);
-	layout->setPadding(7);
+	int x = 7;
+	//All elements are SettingsElements of height 20
+	int y = (canvas->height() - NumElements * 20) / 2;
 
 	for(uint8_t i = 0; i < NumElements; i++){
-		layout->addChild(elements[i]);
+		elements[i]->setPos(x, y);
+		y += elements[i]->getHeight();
 	}
 
-	layout->reflow();
-	screen.addChild(layout);
-	screen.repos();
+	//Center the "Exit Game" text
+	if(exit != nullptr){
+		exit->setX((canvas->width() - exit->getWidth()) / 2);
+	}
 }
 
 void MiniMenu::Menu::returned(void* data){
