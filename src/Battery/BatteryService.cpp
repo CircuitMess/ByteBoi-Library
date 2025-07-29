@@ -21,7 +21,7 @@ void BatteryService::loop(uint micros){
 		}
 		measureCounter++;
 		if(measureCounter == measureCount){
-			voltage = (int) std::round(measureSum / measureCount);
+			voltage = (int) round(measureSum / measureCount);
 
 			measureCounter = 0;
 			measureSum = 0;
@@ -59,12 +59,12 @@ uint16_t BatteryService::getVoltage(bool bypassChrg) const{
 		if(hasChars){
 			return voltage;
 		}else{
-			return (int) std::round(1.0683 * voltage - 197.0);
+			return (int) round(1.0683 * voltage - 197.0);
 		}
 	}else if(ByteBoi.getVer() == ByteBoiImpl::v1_1){
-		return (int) std::round(0.587 * voltage + 1694.0);
+		return (int) round(0.587 * voltage + 1694.0);
 	}else{ // v1.0
-		return (int) std::round(1.1 * voltage + 683);
+		return (int) round(1.1 * voltage + 683);
 	}
 }
 
@@ -141,7 +141,7 @@ void BatteryService::begin(){
 			measureSum += analogRead(BATTERY_PIN);
 		}
 	}
-	voltage = (int) std::round(measureSum / measureCount);
+	voltage = (int) round(measureSum / measureCount);
 	measureSum = 0;
 }
 
@@ -197,7 +197,7 @@ void BatteryService::calibrate(){
 		sum += analogRead(BATTERY_PIN);
 		delay(100 / measureCount);
 	}
-	const uint16_t volt = std::round(sum / (float) measureCount);
+	const uint16_t volt = round(sum / (float) measureCount);
 
 	calibOffset = CalibRef - volt;
 
