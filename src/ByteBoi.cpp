@@ -312,8 +312,127 @@ void ByteBoiImpl::buttonPressed(uint i){
 		}
 	}
 }
+void takeScreenshot(){
+	Serial.print("SD total bytes: ");
+	Serial.println((uint32_t)SD.totalBytes());
+
+	char name[] = "/screenshot_00.bmp";
+	// while (!SD.begin(5, SPI, 8000000))
+	// 	Serial.println("SD ERROR");
+	for (int i = 0; i < 100; i++)
+	{
+		name[13] = i % 10 + '0';
+		name[12] = i / 10 + '0';
+		if (!SD.exists(name))
+			break;
+	}
+	Serial.println(name);
+
+	File file = SD.open(name, "w");
+	if (!file)
+	{
+		Serial.println("SD file error!");
+		return;
+	}
+
+	uint8_t w = 160;
+	uint8_t h = 120;
+	//int px[] = {255, 0, 255, 0, 255, 0};
+	//bool debugPrint = 1;
+	unsigned char *img = NULL; // image data
+	//  int filesize = 54 + 3 * w * h;      //  w is image width, h is image height
+	int filesize = 54 + 4 * w * h; //  w is image width, h is image height
+
+	img = (unsigned char *)malloc(3 * w);
+
+	memset(img, 0, 3 * w); // not sure if I really need this; runs fine without...
+
+	// create file headers (also taken from above example)
+	unsigned char bmpFileHeader[14] = {
+		'B', 'M', 0, 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0};
+	unsigned char bmpInfoHeader[40] = {
+		40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 24, 0};
+	//unsigned char bmpPad[3] = {
+	//	0, 0, 0};
+
+	bmpFileHeader[2] = (unsigned char)(filesize);
+	bmpFileHeader[3] = (unsigned char)(filesize >> 8);
+	bmpFileHeader[4] = (unsigned char)(filesize >> 16);
+	bmpFileHeader[5] = (unsigned char)(filesize >> 24);
+
+	bmpInfoHeader[4] = (unsigned char)(w);
+	bmpInfoHeader[5] = (unsigned char)(w >> 8);
+	bmpInfoHeader[6] = (unsigned char)(w >> 16);
+	bmpInfoHeader[7] = (unsigned char)(w >> 24);
+	bmpInfoHeader[8] = (unsigned char)(h);
+	bmpInfoHeader[9] = (unsigned char)(h >> 8);
+	bmpInfoHeader[10] = (unsigned char)(h >> 16);
+	bmpInfoHeader[11] = (unsigned char)(h >> 24);
+
+	// write the file (thanks forum!)
+	file.write(bmpFileHeader, sizeof(bmpFileHeader)); // write file header
+	file.write(bmpInfoHeader, sizeof(bmpInfoHeader)); // " info header
+
+	for (int i = h - 1; i >= 0; i--) // iterate image array
+	{
+		// memset(img, 0, sizeof(3 * w));        // not sure if I really need this; runs fine without...
+		for (int x = 0; x < w; x++)
+		{
+			auto rgb = ByteBoi.getDisplay()->getBaseSprite()->readPixel(x, i);
+
+
+			uint8_t r = (rgb & 0xF800) >> 8;
+			uint8_t g = (rgb & 0x07E0) >> 3;
+			uint8_t b = (rgb & 0x1F) << 3;
+
+			// r = (r * 255) / 31;
+			// g = (g * 255) / 63;
+			// b = (b * 255) / 31;
+
+			//  r = rgb >> 16;
+			//  g = (rgb & 0x00ff00) >> 8;
+			//  b = (rgb & 0x0000ff);
+
+			// Serial.println(r);
+			// Serial.println(g);
+			// Serial.println(b);
+
+			// delay(1000);
+
+			// rgb = 0;
+			// rgb |= red <<16;
+			// rgb |= blue <<8;
+			// rgb |= green;
+			// Serial.printf("x: %d   y: %d\n", x, y);
+			// delay(5);
+			// int colorVal = px[y*w + x];
+			// img[x*3+2] = (unsigned char)(r);
+			// img[x*3+1] = (unsigned char)(g);
+			// img[x*3+0] = (unsigned char)(b);
+			// Serial.printf("(r, g, b) (%d, %d, %d)\n", r, g, b);
+			file.write(b);
+			file.write(g);
+			file.write(r);
+			// file.write(rgb[0]);
+			// Serial.println(rgb[0]);
+			// file.write(rgb[1]);
+			// Serial.println(rgb[1]);
+			// file.write(rgb[2]);                // write px data
+			// Serial.println(rgb[2]);
+			// delay(5);
+		}
+		// file.write(img + (w * (h - i - 1) * 3), 3 * w);	// write px data
+		// file.write(bmpPad, (4-(w*3)%4)%4);                 // and padding as needed
+	}
+	file.close();
+	free(img);
+}
 
 void ByteBoiImpl::openMenu(){
+
+	takeScreenshot();
+	return;
+
 	if(ContextTransition::isRunning() || ModalTransition::isRunning()) return;
 	if(Modal::getCurrentModal() != nullptr){
 		ModalTransition::setDeleteOnPop(false);
