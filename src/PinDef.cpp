@@ -122,9 +122,9 @@ const PinDefMap<Pin> Pins4 = {
 
 		//HW v2.6: SD is on the native SDMMC slot-1 pins, driven in 1-bit mode. The SD_* names carry
 		//CLK/D0/CMD. DAT3/CS isn't GPIO-connected (pulled up), so SPI mode is impossible - no SD_Cs entry.
-		{ Pin::SD_Sck,    14 },
-		{ Pin::SD_Miso,   2 },
-		{ Pin::SD_Mosi,   15 },
+		{ Pin::SD_Sck,    -1 },
+		{ Pin::SD_Miso,   -1 },
+		{ Pin::SD_Mosi,   -1 },
 
 		{ Pin::TFT_Sck,   26 },
 		{ Pin::TFT_Mosi,  33 },

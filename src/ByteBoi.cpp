@@ -34,6 +34,11 @@ PinMap<Pin> Pins;
 void ByteBoiImpl::begin(){
 	initVer();
 
+	//Ovo je neki SD pin na kojem ne smijemo imati pull-up, jer je strapping pin. Ali SD MMC ne radi bez ovoga, zato koristimo interni pull-up.
+	if(ver == v2_6){
+		gpio_set_pull_mode(GPIO_NUM_2, GPIO_PULLUP_ONLY);
+	}
+
 	if(ver == v1_0){
 		expander = new I2cExpander();
 		expander->begin(0x74, I2C_SDA, I2C_SCL);
@@ -248,7 +253,7 @@ void ByteBoiImpl::checkSD(){
 		}
 	}else{
 		if(sdInserted){
-			File f = SD.open("/.ByteBoi");
+			File f = SD_open("/.ByteBoi");
 			uint8_t b;
 			if(f && f.read(&b, 1)){
 				sdInserted = true;
@@ -436,7 +441,7 @@ ByteBoiImpl::Ver ByteBoiImpl::getVer() const{
 
 bool ByteBoiImpl::SD_begin(){
 	if(ver == v2_6){
-		return SD_MMC.begin("/sdcard", true);
+		return SD_MMC.begin("/sd", true);
 	}
 	return SD.begin(SD_CS, SPI);
 }
